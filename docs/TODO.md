@@ -11,7 +11,7 @@
 - [x] Translate all eight project documents and the DATA.md generator to English.
 - [x] Record the English-language convention while preserving source labels and values.
 
-Current stage complete: Replenishment v1 and explicit-interval stockout correction.
+Current stage complete: Case validation evidence page and a dashboard-only jury walkthrough.
 
 - [ ] Resolve P0: SE master/semantics, current stock, lead times, source precedence.
 - [x] Create the source registry and IEK/SE adapters with validation.
@@ -27,7 +27,7 @@ Current stage complete: Replenishment v1 and explicit-interval stockout correcti
 - [x] Pass 38 tests and audit all 248,915 real transaction/document groups; preserve 417 negatives and 31 blanks.
 - [x] Reproduce all four output artifacts and the summary byte-for-byte in two full runs; flag 918 IEK and 451 SE candidates.
 - [ ] Confirm negative-quantity, blank-month, and duplicate business semantics; provisional policies are documented.
-- [ ] Prepare synthetic acceptance scenarios for the five must-haves.
+- [x] Prepare cross-stage synthetic acceptance for all five must-haves; report evidence limits separately.
 - [x] Implement one-off document candidates with separate raw/regular quantities and explanations.
 - [ ] Validate candidate labels with procurement staff and anonymized customer data when available.
 - [x] Implement explicit-interval stockout estimation before frozen-model production refit; synthetic acceptance passes.
@@ -42,6 +42,27 @@ Current stage complete: Replenishment v1 and explicit-interval stockout correcti
 - [x] Implement Recommended_Order v1 with dated supply, safety days, timing requirements and explicit constraints.
 - [x] Generate 992 scenario recommendations and ten explained examples; strict mode leaves unavailable inputs unresolved.
 - [x] Pass 72 tests and audit all 992 recommendation calculations; full reruns match.
-- [ ] Test history without future leakage and verify the influence of every input.
-- [ ] Add the interface, manager review, and compatible export.
+- [x] Verify causal model selection, causal screening, and stock/forecast/dated-supply/lead/review/safety sensitivity.
+- [ ] Validate category rules and aggregate coefficient applicability; those sources cannot yet influence orders safely.
+- [ ] Evaluate historical order quality with observed stock/receipts or explicitly labeled simulation; do not claim measured savings yet.
+- [x] Add a local dashboard with filters, calculation explanations, dated inventory projection and source evidence.
+- [x] Add per-SKU scenarios through the existing engine, without altering the frozen forecast or stored runs.
+- [x] Add supplier-grouped draft review, manual-quantity reasons and review invalidation after edits.
+- [x] Add reviewed UTF-8 CSV and full-audit JSON downloads; no supplier transmission.
+- [x] Pass 80 tests, including synthetic UI review/export/recalculation and integrity checks.
+- [ ] Complete visual browser QA (browser connector was unavailable during implementation).
+- [ ] Validate the partner's exact 1C import format; generic CSV/JSON are not certified 1C imports.
+- [x] Run `scripts/accept_case.py`: A PARTIAL, B PASS (synthetic), C PASS (synthetic), D PARTIAL, E PASS.
+- [x] Verify a 9,000-unit injected one-off leaves the order at 63; bypassing screening produces 1,224 (0% vs a preset 1% inflation limit).
+- [x] Verify synthetic stockout compensation raises the order from 67 to 104; validate a real flagged candidate with source coordinates.
+- [x] Write DEMO.md with exact actions, SKU codes, expected values and evidence boundaries.
+- [x] Exercise the exact real-data walkthrough with AppTest: IEK 404 → 272 → 172, manual draft 180 plus SE 9; no business approval or supplier transmission.
+- [x] Add five Case validation cards with saved before/after values, distinct evidence types and visible A/D PARTIAL limitations.
+- [x] Add seasonal comparison, daily stockout audit, one-off counterfactual, real candidate provenance and review checks to the dashboard.
+- [x] Validate report freshness/integrity and prevent old PASS fallback; link evidence to matching workflows without changing the draft.
+- [x] Pass 86 tests, including evidence controls, status labels, disabled mismatched-run links and draft-preserving navigation.
+- [ ] Time the full dashboard-only rehearsal on the presentation laptop; functional AppTest is not visual QA.
+- [ ] Confirm whether the jury requires a hosted URL; local offline presentation is available, deployment is not implemented.
 - [ ] Add an LLM after the core calculation, if needed.
+- [ ] Confirm the provider, eligible endpoints, expiry and terms of the user-reported $50 NVIDIA API credits.
+      Potential use: an explanation/query copilot over computed results; no API calls or spending authorized by this note.
