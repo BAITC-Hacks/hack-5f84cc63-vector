@@ -1,309 +1,244 @@
+<a id="russian"></a>
+
 # Vector — AI Procurement Copilot
 
-HackAlem AI / Electrokomplekt. EDA, ingestion, cleaning, forecasting, and replenishment v1 are implemented.
-Explicit-interval stockout correction is implemented; real intervals and current operational stock remain unavailable.
-The Streamlit workspace supports recommendation review, per-SKU scenarios,
-supplier-grouped drafts, and reviewed CSV/JSON exports.
+**[English version ↓](#english)** · [Запуск](#quickstart-ru) · [Демо за 4 минуты](DEMO.md) · [Методология](#methods-ru)
 
-## Open the dashboard
+**Из выгрузок продаж, остатков и поставок — в понятный черновик заказа поставщику.**
 
-```powershell
-.venv/Scripts/python.exe -m pip install -e ".[dashboard]"
-.venv/Scripts/python.exe -m streamlit run app.py
+Vector помогает закупщику ответить на три вопроса: **что заказать, сколько и почему**.
+Вместо ручного объединения Excel — рекомендации по каждому товару, объяснение расчёта
+и проверка менеджером перед экспортом. MVP для **HackAlem AI · Электрокомплект**.
+
+## Что умеет Vector
+
+- Выявляет кандидатов на разовые крупные продажи и исключает их из регулярного расчёта, сохраняя исходные записи.
+- Прогнозирует обычные продажи с учётом сезонности и устойчивого роста, когда хватает истории.
+- Оценивает упущенные продажи при наличии явных периодов отсутствия товара.
+- Учитывает остаток, срок поставки и поступления с конкретными датами.
+- Рассчитывает количество заказа и предупреждает, если обычная поставка придёт слишком поздно.
+- Показывает составляющие расчёта и график прогнозируемого остатка.
+- Позволяет проверить «что если»: изменить остаток, сроки или поставки и сразу пересчитать товар.
+- Собирает черновик по поставщикам и открывает экспорт CSV/JSON после проверки менеджером.
+
+## Как это работает
+
+```mermaid
+flowchart LR
+    A[Выгрузки Excel] --> B[Очистка и разовые продажи]
+    B --> C[Прогноз]
+    C --> D[Расчёт заказа]
+    D --> E[Проверка менеджером]
+    E --> F[Черновик CSV / JSON]
 ```
 
-Open http://localhost:8501. With no private data, the app automatically opens the
-bundled **public synthetic demo**: 40 SKU series, two suppliers, approximately 305 KiB.
-If local completed runs exist in `data/processed/`, those take priority.
-The dashboard discovers completed runs, verifies the
-recommendation hash/count, and defaults to the most recent distinct demonstration run.
-The sidebar also offers strict explicit-input runs. Changing runs resets session drafts.
+В MVP исходные выгрузки обрабатываются через Python pipeline; dashboard открывает готовые
+расчёты. Загрузка Excel через интерфейс и автоматическая синхронизация с 1С пока не реализованы.
 
-The interface defaults to **Russian**. Use **RU / EN** in the sidebar to switch languages.
-All four pages, forms, table headings, chart labels and evidence summaries are localized
-through `src/vector_pipeline/i18n.py`. Widget options keep stable internal IDs: switching
-language preserves the selected run, filters, applied scenarios, draft lines and recorded
-review. Reviewed CSV/JSON schemas, source names/SKU codes, audit keys and entered reasons
-remain unchanged. Documentation and code remain English; source/audit JSON is not translated.
-The workflow labels below use English; their Russian equivalents appear when RU is selected.
+## Попробуйте за минуту
 
-1. **Order planning:** filter by supplier, warehouse, unit, action, or SKU/product;
-   select a table row to see its calculation, inventory projection, assumptions and source evidence.
-2. **What-if scenario:** change available stock, lead/review times, safety days,
-   future receipt delays or an additional dated receipt. Supply a reason and recalculate.
-   Edits affect one SKU in the current session. The engine and frozen forecasts are unchanged.
-3. Add selected recommendations to the draft. Manual quantities require a reason
-   and must satisfy the applied minimum and rounding step. Remove a line to skip it.
-4. **Draft review:** inspect supplier groups, enter a reviewer name, acknowledge the
-   exact quantities and assumptions, then download CSV and the complete audit JSON.
-   Editing a draft invalidates review; editing a scenario removes that SKU's stale draft line.
-5. **Data coverage:** inspect unavailable quantities, missing inputs and measured limitations.
-6. **Case validation:** scan five requirement cards with source/evidence labels, before/after
-   quantities and honest PASS/PARTIAL statuses. Open the saved proofs, the matching SKU's
-   calculation/forecast inputs, or draft review. No acceptance test runs during page rendering.
+1. Откройте **«Проверка кейса» → «Открыть расчёт IEK»**: в публичном демо выбран `SYN-IEK-001`, заказ **105 шт.**
+2. Во вкладке **«Что если?»** задайте остаток **55**, укажите причину и нажмите **«Пересчитать SKU»**: заказ станет **65 шт.**
+3. Добавьте поступление **30 шт.** на **02.10.2026** и пересчитайте: заказ станет **35 шт.**
+4. Добавьте товар в черновик, откройте **«Проверка черновика»**, укажите имя, подтвердите проверку и скачайте CSV.
 
-The default workspace is explicitly a **scenario**, not confirmed company purchasing needs.
-The inventory chart shows the engine's recommendation, not a manually overridden draft quantity.
-No quantity totals combine different units, and no currency savings are invented.
-Product names are loaded only from the matching, verified canonical run; conflicts remain unresolved.
+Срок поставки в этом примере — 3 дня, период пересмотра — 7, страховой запас — 2 дня.
+Все числа этого примера **синтетические**. [Полный сценарий защиты →](DEMO.md)
 
-CSV is UTF-8 with BOM and formula-sensitive strings are escaped. JSON preserves exact
-SKU identifiers, input evidence and calculation details. CSV compatibility with the
-company's specific 1C template remains **unvalidated**; automatic Excel type inference
-can alter numeric-looking identifiers, so import SKU columns as text or use JSON.
-Review is a local acknowledgement, not authenticated corporate approval. Nothing is
-sent to suppliers. Drafts/edits remain in browser-session memory until downloaded;
-reloads, disconnection or run changes can discard them. Streamlit usage telemetry is
-disabled. The committed configuration leaves the listening address to the host.
+### Два режима данных
 
-Install the dashboard extra before running the full test suite. UI tests use synthetic
-fixtures and Streamlit AppTest; they do not approve real business orders. Set
-`VECTOR_PROCESSED_ROOT` to use an alternate local processed-data directory.
+| Режим | Данные | Что увидит пользователь |
+|---|---|---|
+| Публичное демо | 40 синтетических товарных рядов IEK и SystemElectric, около 305 КиБ в `demo/` | Полный сценарий расчёта, изменения, проверки и экспорта с маркировкой демоданных |
+| Локальные данные | Готовые расчёты в `data/processed/` на предоставленных выгрузках | Реальные продажи; неподтверждённые остатки и сроки явно обозначены как сценарные допущения |
 
-## Deploy the public demo
+Приложение выбирает локальные расчёты, если они есть; иначе автоматически открывает `demo/`.
+**В GitHub публикуется `demo/`. Файлы партнёра и `data/processed/` остаются локально.**
 
-**Do not push `data/` or partner Excel files.** Pushing raw Excel without `processed/`
-would not make the dashboard work: it consumes completed recommendation artifacts.
-Commit `demo/` instead, together with the code, `requirements.txt` and `.gitattributes`.
-The generated bundle contains no partner records. The full local dataset remains private.
+<a id="quickstart-ru"></a>
 
-From a clean checkout, no private data or API key is needed:
+## Запуск
+
+Из корня репозитория, в Python 3.11+ (проверено на 3.14):
 
 ```bash
 pip install -e ".[dashboard]"
 streamlit run app.py
 ```
 
-For Streamlit Community Cloud, select the GitHub repository and branch, set the main
-file to **`app.py`**, and select **Python 3.14** in Advanced settings (the local smoke
-check used 3.14). `requirements.txt` installs this package and its pinned dashboard
-dependencies. No Dockerfile, secret, build-time pipeline or startup data generation is
-needed. Official instructions: [deployment](https://docs.streamlit.io/deploy/streamlit-community-cloud/deploy-your-app/deploy)
-and [dependencies](https://docs.streamlit.io/deploy/streamlit-community-cloud/deploy-your-app/app-dependencies).
+Откройте **http://localhost:8501**. Исходные Excel и API-ключи для демо не нужны.
+Интерфейс по умолчанию русский; переключатель **RU / EN** находится слева.
+Смена языка сохраняет сценарий, черновик и отметку о проверке.
 
-The hosted version uses the same scenario/review/export flow but visibly labels **all
-records as synthetic**. Drafts are browser-session state, not durable shared orders.
-To preview public mode on a laptop that has private data:
+Для Streamlit Community Cloud: репозиторий и ветка → основной файл **`app.py`** → Python **3.14**.
+Зависимости устанавливаются через `requirements.txt`; демоданные уже в репозитории.
+Первый публичный запуск и проверка полученного URL ещё предстоят.
+[Инструкция Streamlit](https://docs.streamlit.io/deploy/streamlit-community-cloud/deploy-your-app/deploy).
 
-```powershell
-$env:VECTOR_PROCESSED_ROOT = "demo"
-.venv/Scripts/python.exe -m streamlit run app.py
+<a id="methods-ru"></a>
+
+## Откуда берётся количество заказа
+
+1. **Очистка.** Объём документа сравнивается с предыдущими продажами того же товара,
+   склада и единицы измерения. Медиана и устойчивые статистические пороги помогают
+   выявлять всплески; повторяющиеся крупные заказы учитываются отдельно. При малой истории
+   продажа сохраняется. Исходные значения не удаляются, отрицательные не превращаются в положительные.
+2. **Прогноз.** Простые модели сравниваются на прошлых периодах; последний контрольный период
+   не участвует в выборе модели. Сезонность и рост входят в прогноз. При наличии периодов
+   отсутствия товара история корректируется перед пересчётом прогноза.
+3. **Заказ.** Прогноз на срок поставки и период пересмотра + страховой запас − доступный
+   остаток − подходящие по датам поступления. Дополнительно проверяется дефицит между
+   поставками и применяются определённые ограничения партии и округления.
+
+Сезонность, рост и компенсация отсутствия товара **не добавляются к заказу повторно**.
+Если дефицит наступает раньше новой поставки, Vector предлагает ускорение или перемещение.
+Количество рассчитывает алгоритм; LLM в текущем MVP не подключён.
+
+## Пять требований — пять доказательств
+
+Все примеры доступны на экране **«Проверка кейса»**.
+
+| Требование | Результат | Доказательство и границы |
+|---|---|---|
+| Базовое пополнение | Частично | В синтетическом демо остаток и поставка меняют заказ **105 → 65 → 35**. Категории и применимость внешних коэффициентов не подтверждены. |
+| Сезонность и рост | Пройдено на синтетике | На 36 месяцах восстанавливаются сезонный рисунок и рост **+5 ед./месяц**. |
+| Упущенные продажи | Пройдено на синтетике | Коррекция повышает заказ **67 → 104**. Реальные периоды отсутствия товара не предоставлены. |
+| Разовый крупный заказ | Частично | Вставка **9 000 ед.** оставляет очищенный заказ **63**, вместо **1 224** без очистки. Анализ по клиенту ещё не реализован; нет обезличенных ID клиентов. |
+| Объяснение и проверка по поставщикам | Пройдено для MVP | Ручное изменение с причиной → проверка → CSV/JSON. Изменение расчёта отменяет прежнюю проверку. |
+
+## Статус и ограничения
+
+Рабочий MVP с воспроизводимым расчётом и интерфейсом. На частных данных прогноз сформирован
+для **992 из 2 716** товарных рядов; остальные требуют уточнения истории или её качества.
+Пробелы видны в **«Качестве данных»** и не подменяются нулями.
+
+Реальные текущие остатки, сроки поставщиков и периоды отсутствия товара не подтверждены.
+Нет доказанного снижения затрат; прогноз не превосходит базовую модель во всех сегментах.
+Экспорт — CSV/JSON, совместимость с конкретным шаблоном 1С ещё не проверена.
+Заказы не отправляются поставщикам. Проверка действует в текущем сеансе и не заменяет
+корпоративную авторизацию; черновик нужно скачать до завершения сеанса.
+
+## Подробнее
+
+[Сценарий защиты](DEMO.md) · [Кейс](docs/CASE.md) · [Архитектура и команды](docs/ARCHITECTURE.md#private-pipeline-commands)
+· [Очистка и выбросы](docs/DEMAND_POLICY.md) · [Прогнозирование](docs/FORECAST_POLICY.md)
+· [Заказ и stockout](docs/REPLENISHMENT_POLICY.md) · [Факты о данных](docs/DATA_FINDINGS.md)
+· [Открытые вопросы](docs/OPEN_QUESTIONS.md).
+
+---
+
+<a id="english"></a>
+
+## English
+
+**[Русская версия ↑](#russian)** · [Four-minute demo](DEMO.md)
+
+**Turn sales, inventory and incoming-supply exports into an explained supplier order draft.**
+
+Vector helps purchasing managers decide **what to order, how much and why**.
+It replaces manual spreadsheet consolidation with per-item recommendations, transparent
+calculations and manager review before export. Built for **HackAlem AI · Electrokomplekt**.
+
+### What Vector does
+
+- Flags candidate one-off bulk sales and excludes them from regular calculations while retaining the original records.
+- Forecasts regular sales, including seasonality and sustained growth where history supports them.
+- Estimates missing sales when explicit stockout intervals are available.
+- Accounts for available stock, supplier lead times and dated incoming receipts.
+- Calculates order quantities and warns when normal delivery would arrive too late.
+- Explains calculation components and charts projected inventory.
+- Recalculates what-if scenarios for stock, lead times and incoming supply.
+- Groups drafts by supplier and enables CSV/JSON export after manager review.
+
+### How it works
+
+```text
+Excel exports → Cleaning and one-off detection → Forecast
+→ Replenishment calculation → Manager review → CSV / JSON draft
 ```
 
-Remove that environment override to return to private runs. The public demo has its
-own short walkthrough in [DEMO.md](DEMO.md). After code changes affecting saved
-evidence, rebuild using `python scripts/build_demo.py`. Its inputs are only generated
-histories and public code/configuration; raw Excel and private artifacts are never read.
-One focused deployment check is sufficient for this change:
+The MVP processes supplied exports through a Python pipeline; the dashboard consumes
+prepared calculations. UI Excel upload and scheduled 1C synchronization are not implemented.
+
+### Try it in one minute
+
+1. Select **EN**, then **Case validation → Open IEK calculation**: public SKU `SYN-IEK-001` recommends **105 units**.
+2. In **What-if scenario**, set available stock to **55**, enter a reason and recalculate: **65 units**.
+3. Add an incoming receipt of **30 units** on **2026-10-02** and recalculate: **35 units**.
+4. Add the item to the draft, open **Draft review**, enter a reviewer name, acknowledge and download the reviewed CSV.
+
+Keep lead time at 3 days, review period at 7 and safety at 2. These figures are
+**synthetic**, not partner purchasing needs. [Full jury walkthrough →](DEMO.md)
+
+### Demo data and local startup
+
+| Mode | Data | Behaviour |
+|---|---|---|
+| Public demo | 40 generated SKU series across IEK and SystemElectric; about 305 KiB in `demo/` | Complete scenario, review and export workflow with explicit synthetic labels |
+| Private local data | Prepared runs in `data/processed/` based on supplied exports | Real observed sales; unconfirmed operational inputs remain labeled scenario assumptions |
+
+Private completed runs take priority. Without them, the app automatically opens the bundled
+demo. **Commit `demo/`; keep partner Excel and private processed data out of GitHub.**
+
+From the repository root, using Python 3.11+ (checked on 3.14):
 
 ```bash
-python -m unittest discover -s tests -p test_public_demo.py -q
+pip install -e ".[dashboard]"
+streamlit run app.py
 ```
 
-This copies the public runtime to a temporary checkout without `data/` and checks all
-four pages, RU/EN, scenario recalculation and reviewed export. It uses installed
-dependencies; the actual hosted Linux install and public URL still need a first deploy.
+Open **http://localhost:8501**. Demo mode needs no private workbooks or API keys.
+Russian is the default; **RU / EN** preserves scenarios, drafts and recorded review.
 
-## Run (PowerShell, Python 3.11+)
+For Streamlit Community Cloud: repository/branch → entrypoint **`app.py`** → Python **3.14**.
+`requirements.txt` installs the dependencies; demo artifacts are already bundled.
+The first hosted launch and public-URL check remain pending.
+[Official deployment guide](https://docs.streamlit.io/deploy/streamlit-community-cloud/deploy-your-app/deploy).
 
-```powershell
-python -m venv .venv
-.venv/Scripts/python.exe -m pip install -e .
-.venv/Scripts/python.exe -X utf8 scripts/eda.py
-.venv/Scripts/python.exe -X utf8 -m vector_pipeline.cli
-.venv/Scripts/python.exe -m unittest discover -s tests -v
-```
+### How quantities are calculated
 
-Source Excel directories: data/IEK/ and data/system_electric/. Run from the project root.
-Workbooks are opened read-only; SHA-256 is checked before and after processing.
-Do not replace source files during a run.
+1. **Clean observed sales.** Compare each document with earlier sales for the same SKU,
+   warehouse and unit using median-based robust thresholds. Recognize recurring large
+   orders and preserve sparse-history sales. Keep original values; never turn negative
+   quantities positive automatically.
+2. **Forecast.** Compare simple models on rolling historical periods, keeping the final
+   holdout out of model selection. Seasonality and growth are forecast components.
+   Explicit stockout intervals can correct history before refitting the forecast.
+3. **Replenish.** Forecast over lead time plus review period + safety stock − available
+   stock − qualifying dated receipts. Check shortages between receipts, then apply
+   resolved order constraints and rounding.
 
-EDA outputs: data/processed/eda_summary.json and docs/DATA.md.
-Rerunning EDA overwrites these generated reports. Alternative output paths:
+Seasonality, growth and stockout recovery are not added to the order a second time.
+Shortages before a new order arrives require expedited supply or a transfer. Quantities
+come from deterministic calculations; the current MVP has no LLM integration.
 
-```powershell
-.venv/Scripts/python.exe -X utf8 scripts/eda.py --output data/processed/eda_check.json --markdown data/processed/eda_check.md
-```
+### Five requirements, five proofs
 
-data/processed/ and .venv/ are excluded from Git. The report is reproducible locally.
-Do not add source sales data to a public repository.
+All examples are available on the **Case validation** page.
 
-## EDA methodology
-
-All workbooks, sheets, and rows are analyzed for headers, types, dates, SKUs, nulls,
-duplicates, totals, signs, and extreme numeric values. Codes are joined after trimming
-whitespace, without removing leading zeros or underscores.
-Totals and rows without codes are excluded from SKU profiles but retained in the report.
-Signs are preserved; blanks do not become zeros. Formulas are read together with their
-cached values, without recalculation. Empty XML cells of type e are tracked separately as nulls.
-
-MOQ coverage distinguishes absent codes, invalid values, and positive values.
-Monthly quantities are compared with transactions only on observed numeric pairs.
-Column-level 3×IQR diagnostics mix SKUs and units: they are not a production algorithm
-for excluding one-off orders. Document-level screening is implemented separately below;
-order methodology is documented in [Replenishment policy](docs/REPLENISHMENT_POLICY.md).
-
-## Findings
-
-12 files do not constitute a complete input set: some SE filenames do not match their
-contents; two files are copies of MOQ, and the reported SE master table was not found.
-
-[Findings](docs/DATA_FINDINGS.md) · [Questions](docs/OPEN_QUESTIONS.md) ·
-[Schema](docs/ARCHITECTURE.md) · [Plan](docs/TODO.md) · [Requirements](docs/CASE.md).
-
-## Supplier ingestion
-
-`config/sources.json` contains 13 reviewed sheet mappings across 12 files, including
-the explicitly excluded identical SE MOQ copy. Source SHA-256 and headers must match;
-new, missing, or changed workbooks require a reviewed registry update. No role is inferred
-from a filename at runtime. Changing filenames alone also requires a path update.
-
-`IEKAdapter` and `SystemElectricAdapter` produce shared, validated JSONL contracts.
-Each run creates a new directory under `data/processed/canonical/`; the CLI prints its path.
-Existing runs are not overwritten. `ingestion_summary.json` is written only after
-the run completes and source hashes have been rechecked. Failed runs contain `FAILED.json`.
-
-Outputs include products, product observations, transactions, monthly measures,
-inventory snapshots, shipment cells, order constraints, aggregate measures,
-source coefficients, source controls, quarantine, and manifest/schema snapshots.
-See [implementation details](docs/ARCHITECTURE.md#implemented-ingestion-contract).
-
-Validate a completed run independently against the EDA profiles:
-
-```powershell
-.venv/Scripts/python.exe -X utf8 scripts/verify_ingestion.py data/processed/canonical/<run-directory>
-```
-
-Replace `<run-directory>` with the directory printed by ingestion. Validation checks
-artifact/source hashes, schema types, IDs, product references, source exclusion, and
-column-level numeric counts, sums, signs, and missing values.
-
-## Explicit assumptions
-
-`config/ingestion.json` keeps lead times, review periods, and service levels unresolved
-by default. Ingestion succeeds without inventing these inputs. Policy values are recorded
-for later calculation stages; ingestion does not use them to calculate orders.
-
-To explore a monthly interpretation, add an explicit entry to `source_overrides`:
-
-```json
-{
-  "se_monthly_unspecified": {
-    "measure_kind": {
-      "value": "inventory",
-      "status": "assumption",
-      "id": "SE-INVENTORY-DEMO",
-      "reason": "Temporary interpretation for a labeled demo; not confirmed by the supplier"
-    }
-  }
-}
-```
-
-This is an example, **not enabled in the shipped configuration**. The source remains
-unknown by default. `snapshot_semantics` can similarly be `beginning`, `end`, or `unknown`;
-`constraint_kind` can be `minimum`, `multiple`, or `unknown`. Overrides require an ID,
-reason, and `assumption`/`confirmed` status; confirmed values require evidence.
-Assumed values propagate `assumption_ids` and `assumption_applied` to affected records.
-Confirmations and the effective settings remain in each run's report.
-
-## Demand cleaning and outlier detection v1
-
-```powershell
-.venv/Scripts/python.exe -X utf8 -m vector_pipeline.demand_cli data/processed/canonical/<run-directory>
-```
-
-Use a completed canonical run. Outputs are written to a new `data/processed/demand/`
-directory: cleaned transactions, document-level demand, flagged documents, per-source
-monthly reconciliation, and a summary with counts, examples, configuration, and hashes.
-
-Transactions are the primary **observed-sales** source; monthly tables are reference-only.
-An explainable median/IQR/MAD detector uses earlier days within each SKU/warehouse/unit.
-It preserves sparse-history sales and recurring large orders, and excludes flagged
-one-off candidates from a separate `qty_regular` measure while retaining raw quantities.
-Unresolved negatives and invalid documents retain null regular quantities.
-
-Thresholds and minimum history are in `config/demand.json`. See
-[Demand policy](docs/DEMAND_POLICY.md) for the formula, source choices, recurrence rule,
-assumptions, reconciliation semantics, local results, limitations, and reproduction details.
-`scripts/verify_demand.py` independently audits a run and can compare repeated outputs.
-Flags have no business-confirmed labels yet; document IDs do not identify customers.
-
-## Forecasting v1
-
-```powershell
-.venv/Scripts/python.exe -X utf8 -m vector_pipeline.forecast_cli data/processed/demand/<demand-run>
-.venv/Scripts/python.exe -X utf8 scripts/verify_forecast.py data/processed/forecast/<forecast-run>
-```
-
-Configuration: `config/forecast.json`, with an explicit cutoff of 2026-09-22.
-Models: three-month mean, EWMA, trend with seasonality when history supports it, and
-seasonal naive. Last-value naive is an additional benchmark. Rolling-origin selection
-excludes the final August holdout. Missing months are unknown, and September is excluded
-as partial. Forecasts cover October–December in each SKU's warehouse and stock unit.
-
-Outputs include monthly series, coverage/exclusion reasons, model scores, historical
-predictions, the forecast table with both selected and baseline quantities, and a summary.
-See [Forecast policy and measured results](docs/FORECAST_POLICY.md).
-
-On the current data, 992 of 2,716 transaction-observed series are forecastable.
-The selected policy beats the mean baseline for IEK meters/packs but loses for IEK/SE
-pieces on the August holdout. This limitation is reported explicitly; the model is not
-claimed to improve every segment. No inventory or order-quality improvement is established.
-
-## Replenishment v1
-
-```powershell
-.venv/Scripts/python.exe -X utf8 -m vector_pipeline.replenishment_cli data/processed/forecast/<forecast-run> data/processed/canonical/<canonical-run> --demo
-```
-
-This explicitly enables an October 1 planning scenario with real forecasts and labeled
-synthetic stock/lead-time inputs. It produces 992 scenario recommendations on the current
-data, with formulas, dated supply, shortage dates, rounding rules, and ten readable examples.
-Without `--demo` or `--inputs`, missing operational inputs produce unavailable quantities.
-Outputs are under `data/processed/replenishment/`; open `examples.md` for the first ten orders.
-
-Stockout correction accepts explicit intervals and matching daily observations, estimates
-lost sales from earlier history, and refits the frozen forecast model. Real intervals are
-absent; synthetic tests demonstrate the correction. Forecast v1 was not tuned in this stage.
-See [Replenishment policy, inputs and verified results](docs/REPLENISHMENT_POLICY.md).
-
-The dashboard uses these outputs directly; see the launch and review workflow above.
-Next: rehearse the complete case demo, validate the partner's operational inputs and
-1C import template, and measure order quality under an explicit historical evaluation protocol.
-No automatic supplier sending or LLM calculation is implemented.
-
-## Case acceptance and jury walkthrough
-
-```powershell
-.venv/Scripts/python.exe -X utf8 scripts/accept_case.py
-```
-
-This runs the existing cleaning, forecast, stockout, order and dashboard code on explicit
-synthetic scenarios, verifies real demo examples, and checks all 12 registered workbook
-hashes and unchanged core/config/source files. The command prints a compact result and
-writes `data/processed/acceptance/<report-hash>/case_acceptance.json`. Identical reruns
-produce the same report. Use `--replenishment` and `--demand` to select the audited runs;
-the default run IDs are documented in the policy files. Failure of an executable check
-returns a nonzero exit code. PARTIAL means a known requirement/evidence gap, not a failed test.
-
-| Must-have | Result | Evidence boundary |
+| Requirement | Result | Evidence and boundary |
 |---|---|---|
-| Base replenishment | PARTIAL | Numeric inputs affect orders correctly; category data and validated external coefficient applicability are missing. |
-| Seasonality and growth | PASS | Joint mechanism verified on 36 synthetic months; no new real-data superiority claim. |
-| Stockout compensation | PASS | Synthetic intervals increase the order from 67 to 104; real intervals remain absent. |
-| One-off exclusion | PARTIAL | A 9,000-unit injection leaves the regular order at 63 instead of 1,224 unscreened; client-level detection cannot be established without customer IDs. |
-| Explained supplier-grouped reviewed orders | PASS | Two-supplier AppTest verifies manual adjustment, review, CSV/JSON and invalidation; local review only. |
+| Base replenishment | PARTIAL | Synthetic stock and receipt changes produce **105 → 65 → 35**. Categories and external coefficient applicability remain unresolved. |
+| Seasonality and growth | PASS, synthetic | A generated 36-month series recovers the annual pattern and **+5 units/month** growth. |
+| Stockout compensation | PASS, synthetic | Correction raises the order **67 → 104**. Real stockout intervals were not supplied. |
+| One-off protection | PARTIAL | Injecting **9,000 units** leaves the cleaned order at **63**, versus **1,224** without cleaning. Customer grouping is not implemented; anonymized customer IDs are absent. |
+| Explained supplier-grouped review | PASS for MVP | Reasoned manual adjustment → review → CSV/JSON. Scenario edits invalidate the previous review. |
 
-[DEMO.md](DEMO.md) gives a 3–5 minute script with exact clicks and expected values.
-The demonstration now stays inside the dashboard: **Case validation** reads the latest
-acceptance report and provides seasonal, stockout, anomaly and review evidence below its
-five summary cards. It verifies the report content hash, current code/config/source hashes,
-and referenced data artifacts. Missing, stale or corrupt reports show a regeneration command;
-a failed latest run never falls back to an older PASS. Re-run acceptance after code changes.
-Recorded examples remain separate from current session edits. Links to real SKU calculations
-are disabled when the selected calculation snapshot differs from the audited one.
+### Status and limitations
 
-91 tests pass, including evidence integrity/staleness, status rendering, proof controls,
-workflow navigation, translation coverage, placeholder parity and RU/EN switching with
-unchanged scenario/review/export state. Browser visual QA, the exact
-1C template, and operational data confirmation remain open. No new model or LLM was added.
+Working MVP with reproducible calculations and a bilingual interface. The private dataset
+supports forecasts for **992 of 2,716** observed series; the remainder require history or
+data-quality resolution. **Data coverage** exposes gaps without inventing values.
+
+Current partner stock, supplier times and real stockout intervals are unconfirmed.
+No inventory-cost reduction has been established, and the forecast does not beat the
+baseline in every segment. Export is CSV/JSON; exact 1C import compatibility is unverified.
+Nothing is sent to suppliers. Review is a session acknowledgement, not corporate
+authorization; download the draft before ending the session.
+
+### Technical documentation
+
+[Demo script](DEMO.md) · [Case](docs/CASE.md) · [Architecture and commands](docs/ARCHITECTURE.md#private-pipeline-commands)
+· [Demand cleaning](docs/DEMAND_POLICY.md) · [Forecast methodology](docs/FORECAST_POLICY.md)
+· [Replenishment and stockout](docs/REPLENISHMENT_POLICY.md) · [Data findings](docs/DATA_FINDINGS.md)
+· [Open questions](docs/OPEN_QUESTIONS.md).
