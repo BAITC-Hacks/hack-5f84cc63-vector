@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "source_overrides": {},
+  "supplier_policies": {
+    "IEK": {
+      "lead_time_days": {
+        "value": null,
+        "status": "unresolved",
+        "reason": "Not supplied in the reviewed inputs"
+      },
+      "review_period_days": {
+        "value": null,
+        "status": "unresolved",
+        "reason": "Not supplied in the reviewed inputs"
+      },
+      "service_level": {
+        "value": null,
+        "status": "unresolved",
+        "reason": "Not supplied in the reviewed inputs"
+      }
+    },
+    "SystemElectric": {
+      "lead_time_days": {
+        "value": null,
+        "status": "unresolved",
+        "reason": "Not supplied in the reviewed inputs"
+      },
+      "review_period_days": {
+        "value": null,
+        "status": "unresolved",
+        "reason": "Not supplied in the reviewed inputs"
+      },
+      "service_level": {
+        "value": null,
+        "status": "unresolved",
+        "reason": "Not supplied in the reviewed inputs"
+      }
+    }
+  }
+}

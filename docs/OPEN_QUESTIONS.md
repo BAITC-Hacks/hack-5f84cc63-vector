@@ -22,3 +22,34 @@ Checked on 23.09.2026. SE MOQ was found and read; its previously reported absenc
 Record the source, date, rule, and affected calculations for every answer.
 Do not claim customer-level detection has been validated on real data without client_id.
 Document aggregation is a separately labeled approximation.
+
+## Implementation policy while answers are pending
+
+Ingestion is implemented and runs with unresolved values. Source semantic overrides in
+`config/ingestion.json` require a reason and `assumption`/`confirmed` status; confirmed
+overrides require evidence. Assumptions are carried into records and the run report.
+Supplier policy values remain null by default. Explicit scenario values can be configured
+for subsequent stages without presenting them as established supplier rules.
+Completing ingestion does not close the business questions above.
+
+Demand cleaning v1 now explicitly selects transactions as primary observed sales and
+uses monthly sources only for reconciliation. This implementation choice does not
+resolve the reason for discrepancies or validate a monthly fallback. Negative quantities
+remain unresolved with null regular quantities. See [DEMAND_POLICY.md](DEMAND_POLICY.md).
+Business labels for one-off candidates and actual document posting/availability times
+are still needed to assess detection quality and historical backdated corrections.
+
+Forecasting v1 uses a labeled January 2025 source-coverage assumption. Supplier
+confirmation of export completeness, product activity dates, and zero-versus-missing
+months is still required. Forecasts currently cover 992 of 2,716 transaction-observed
+series; the remainder are reported explicitly rather than zero-filled. Portfolio
+seasonality coefficients still lack confirmed SKU applicability and historical
+availability. See [FORECAST_POLICY.md](FORECAST_POLICY.md) for the independent holdout
+results, including the segments where model selection underperforms the baseline.
+
+Replenishment v1 now runs in explicit-input or demo-scenario mode. The October 1 demo
+does not resolve missing current stock or supplier lead times: each assumed value is
+labeled. Confirm intramonth demand/receipt timing, whether unmet demand is backordered
+or lost, and allowed stock-unit increments before operational use. Source shipment
+deadlines, warehouse/unit assignment and SE order-unit conversion remain assumptions.
+The interval-based stockout interface is implemented, but real intervals remain unavailable.

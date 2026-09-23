@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "primary_sources": {"IEK": "iek_transactions", "SystemElectric": "se_transactions"},
+  "monthly_policy": "reconciliation_only",
+  "negative_policy": "unresolved_exclude_from_regular",
+  "outlier_action": "exclude_document_positive_quantity",
+  "assumption_ids": ["DEMAND-POSITIVE-OBSERVED-V1", "DEMAND-NEGATIVE-UNRESOLVED-V1", "DEMAND-DOCUMENT-PROXY-V1", "DEMAND-ROBUST-THRESHOLDS-V1", "DEMAND-EVENT-DATE-AVAILABILITY-V1"],
+  "detector": {
+    "lookback_days": 365,
+    "max_history_documents": 200,
+    "min_history_documents": 20,
+    "min_history_days": 5,
+    "median_multiplier": 8.0,
+    "iqr_multiplier": 6.0,
+    "mad_multiplier": 8.0,
+    "mad_scale": 1.4826,
+    "repeat_quantity_factor": 2.0,
+    "min_similar_documents": 3,
+    "min_similar_days": 3
+  },
+  "reconciliation": {"absolute_tolerance": 0.000001, "relative_tolerance": 0.0},
+  "examples_per_supplier": 5
+}

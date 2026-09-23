@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "planning_date": "2026-10-01",
+  "policies": {
+    "daily_allocation": {"status": "scenario", "id": "ORDER-UNIFORM-DAILY-V1", "reason": "Allocate each monthly forecast uniformly over calendar days; intra-month profile is unknown."},
+    "unmet_demand_policy": {"status": "scenario", "id": "ORDER-BACKLOG-PROJECTION-V1", "reason": "Negative projected inventory represents cumulative unmet demand carried forward, not measured lost sales."},
+    "numeric_tolerance": 0.000000001
+  },
+  "stockout": {"baseline_months": 3, "assumption_id": "STOCKOUT-PRIOR-RATE-V1"},
+  "demo": {
+    "id": "DEMO-ORDER-OCTOBER-2026",
+    "reason": "Future planning scenario using real forecasts; stock, supplier times, daily profile and missing-supply assumptions are not partner-confirmed.",
+    "stock_quantity_increments": {"шт": 1, "упак": 1, "м": 0.01},
+    "supplier_values": {
+      "IEK": {"lead_time_days": 45, "review_period_days": 30, "safety_days": 7, "available_stock_days": 12},
+      "SystemElectric": {"lead_time_days": 30, "review_period_days": 30, "safety_days": 7, "available_stock_days": 20}
+    },
+    "shipment_interpretation": "deadline_as_arrival_stock_unit_same_warehouse",
+    "se_constraint_interpretation": "standalone_multiple_in_stock_units_if_no_conflict"
+  }
+}

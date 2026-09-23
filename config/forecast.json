@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "as_of_date": "2026-09-22",
+  "horizon_months": 3,
+  "min_history_months": 3,
+  "validation_origins": 4,
+  "validation_horizon": 4,
+  "minimum_mae_improvement": 0.05,
+  "minimum_origin_win_share": 0.75,
+  "numeric_tolerance": 0.000000001,
+  "models": {
+    "mean": {"window": 3},
+    "ewma": {"alpha": 0.4},
+    "trend_seasonal": {"trend_window": 6, "maximum_monthly_slope_fraction": 0.25, "seasonal_min_months": 24},
+    "seasonal_naive": {"period": 12}
+  },
+  "coverage_policy": "unknown_months_break_history",
+  "source_coverage": {
+    "iek_transactions": {"start_month": "2025-01", "status": "assumption", "id": "FORECAST-IEK-EXPORT-COVERAGE-V1", "reason": "Observed positive transaction history starts in 2025; full-month export completeness is not supplier-confirmed."},
+    "se_transactions": {"start_month": "2025-01", "status": "assumption", "id": "FORECAST-SE-EXPORT-COVERAGE-V1", "reason": "Observed positive transaction history starts in 2025; full-month export completeness is not supplier-confirmed."}
+  },
+  "assumption_ids": ["FORECAST-OBSERVED-SALES-V1", "FORECAST-MONTH-COVERAGE-V1", "FORECAST-MODEL-POLICY-V1"],
+  "examples_per_supplier": 3
+}

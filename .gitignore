@@ -1,0 +1,16 @@
+data/processed/
+# Secrets
+.env
+*.env
+
+# Python
+__pycache__/
+*.pyc
+*.egg-info/
+.venv/
+venv/
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
