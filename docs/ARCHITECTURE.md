@@ -1,7 +1,7 @@
 # Architecture and proposed canonical schema
 
 Status on 23.09.2026: EDA, ingestion, cleaning, forecasting, explicit-interval stockout correction,
-and replenishment v1 are implemented. A local Streamlit review workspace is implemented;
+and replenishment v1 are implemented. A bilingual Streamlit review workspace and public demo bundle are implemented;
 LLM features are not implemented.
 The table below describes the intended model; the implemented subset is specified separately below.
 
@@ -182,3 +182,20 @@ Recommended_Order v1 runs with explicit current-stock, horizon, units and shipme
 the shipped real-data demonstration supplies labeled scenario assumptions where evidence is missing.
 Check shortages before arrivals, not only the final inventory balance.
 Do not conflate minimum quantity and order multiple. Any future LLM must explain computed numbers.
+
+## Public deployment
+
+`select_processed()` prefers completed private runs and falls back to the committed
+`demo/` tree. `VECTOR_PROCESSED_ROOT=demo` previews that mode explicitly. Forty generated
+SKU series, product names, synthetic candidate records and saved acceptance evidence
+use the same verified-table and recommendation contracts. The public mode is visibly
+labeled and contains no copied partner observations. Nothing trains at app startup.
+
+`scripts/build_demo.py` reuses the existing forecast, cleaning and order functions plus
+small synthetic acceptance scenarios. The public report records normalized source hashes
+and exact artifact hashes; `.gitattributes` fixes demo artifacts to LF across platforms.
+Private acceptance checks remain unchanged and still require private source artifacts.
+The cloud entrypoint is `app.py`; `requirements.txt` installs `.[dashboard]`. There is
+no committed loopback binding. Public-host deployment and visual browser QA are pending.
+For this packaging/UI change, only the synthetic bundle build and focused clean-checkout
+smoke check were run; the full unit suite was not rerun.

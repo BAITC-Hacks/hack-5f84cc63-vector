@@ -2,7 +2,7 @@
 
 HackAlem AI / Electrokomplekt. EDA, ingestion, cleaning, forecasting, and replenishment v1 are implemented.
 Explicit-interval stockout correction is implemented; real intervals and current operational stock remain unavailable.
-The local Streamlit workspace supports recommendation review, per-SKU scenarios,
+The Streamlit workspace supports recommendation review, per-SKU scenarios,
 supplier-grouped drafts, and reviewed CSV/JSON exports.
 
 ## Open the dashboard
@@ -12,8 +12,10 @@ supplier-grouped drafts, and reviewed CSV/JSON exports.
 .venv/Scripts/python.exe -m streamlit run app.py
 ```
 
-Open http://127.0.0.1:8501. A completed replenishment run is required; use the pipeline
-commands below if none exists. The dashboard discovers completed runs, verifies the
+Open http://localhost:8501. With no private data, the app automatically opens the
+bundled **public synthetic demo**: 40 SKU series, two suppliers, approximately 305 KiB.
+If local completed runs exist in `data/processed/`, those take priority.
+The dashboard discovers completed runs, verifies the
 recommendation hash/count, and defaults to the most recent distinct demonstration run.
 The sidebar also offers strict explicit-input runs. Changing runs resets session drafts.
 
@@ -51,12 +53,56 @@ company's specific 1C template remains **unvalidated**; automatic Excel type inf
 can alter numeric-looking identifiers, so import SKU columns as text or use JSON.
 Review is a local acknowledgement, not authenticated corporate approval. Nothing is
 sent to suppliers. Drafts/edits remain in browser-session memory until downloaded;
-reloads, disconnection or run changes can discard them. The server binds to localhost
-and Streamlit usage telemetry is disabled.
+reloads, disconnection or run changes can discard them. Streamlit usage telemetry is
+disabled. The committed configuration leaves the listening address to the host.
 
 Install the dashboard extra before running the full test suite. UI tests use synthetic
 fixtures and Streamlit AppTest; they do not approve real business orders. Set
 `VECTOR_PROCESSED_ROOT` to use an alternate local processed-data directory.
+
+## Deploy the public demo
+
+**Do not push `data/` or partner Excel files.** Pushing raw Excel without `processed/`
+would not make the dashboard work: it consumes completed recommendation artifacts.
+Commit `demo/` instead, together with the code, `requirements.txt` and `.gitattributes`.
+The generated bundle contains no partner records. The full local dataset remains private.
+
+From a clean checkout, no private data or API key is needed:
+
+```bash
+pip install -e ".[dashboard]"
+streamlit run app.py
+```
+
+For Streamlit Community Cloud, select the GitHub repository and branch, set the main
+file to **`app.py`**, and select **Python 3.14** in Advanced settings (the local smoke
+check used 3.14). `requirements.txt` installs this package and its pinned dashboard
+dependencies. No Dockerfile, secret, build-time pipeline or startup data generation is
+needed. Official instructions: [deployment](https://docs.streamlit.io/deploy/streamlit-community-cloud/deploy-your-app/deploy)
+and [dependencies](https://docs.streamlit.io/deploy/streamlit-community-cloud/deploy-your-app/app-dependencies).
+
+The hosted version uses the same scenario/review/export flow but visibly labels **all
+records as synthetic**. Drafts are browser-session state, not durable shared orders.
+To preview public mode on a laptop that has private data:
+
+```powershell
+$env:VECTOR_PROCESSED_ROOT = "demo"
+.venv/Scripts/python.exe -m streamlit run app.py
+```
+
+Remove that environment override to return to private runs. The public demo has its
+own short walkthrough in [DEMO.md](DEMO.md). After code changes affecting saved
+evidence, rebuild using `python scripts/build_demo.py`. Its inputs are only generated
+histories and public code/configuration; raw Excel and private artifacts are never read.
+One focused deployment check is sufficient for this change:
+
+```bash
+python -m unittest discover -s tests -p test_public_demo.py -q
+```
+
+This copies the public runtime to a temporary checkout without `data/` and checks all
+four pages, RU/EN, scenario recalculation and reviewed export. It uses installed
+dependencies; the actual hosted Linux install and public URL still need a first deploy.
 
 ## Run (PowerShell, Python 3.11+)
 

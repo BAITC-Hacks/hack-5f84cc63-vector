@@ -64,7 +64,10 @@ Current stage complete: Russian-default UI with RU/EN switching across all four 
 - [x] Add central RU/EN translations, Russian default, localized forms/tables/charts, and stable internal page/filter values.
 - [x] Pass 91 tests; language switching preserves scenarios, drafts, review and reviewed CSV/JSON bytes.
 - [ ] Time the full dashboard-only rehearsal on the presentation laptop; functional AppTest is not visual QA.
-- [ ] Confirm whether the jury requires a hosted URL; local offline presentation is available, deployment is not implemented.
+- [x] Package a public synthetic demo (40 SKU series), automatically used when private runs are absent.
+- [x] Make configuration cloud-ready, declare dashboard installation, and verify a checkout without private data using one focused smoke check.
+- [x] Shorten chart legends, clarify scenario shortage counts and collapse raw technical audit fields.
+- [ ] Push the prepared files manually and deploy `app.py` to Streamlit Community Cloud; verify the public URL and Linux dependency install.
 - [ ] Add an LLM after the core calculation, if needed.
 - [ ] Confirm the provider, eligible endpoints, expiry and terms of the user-reported $50 NVIDIA API credits.
       Potential use: an explanation/query copilot over computed results; no API calls or spending authorized by this note.

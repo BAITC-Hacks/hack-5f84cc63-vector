@@ -1,0 +1,10 @@
+{
+  "is_synthetic": true,
+  "status": "complete",
+  "tables": {
+    "products.jsonl": {
+      "rows": 40,
+      "sha256": "ecc0610c10d961449bab11617a35ef13d238cb26391d26e9111e167acb1f1641"
+    }
+  }
+}

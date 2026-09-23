@@ -1,0 +1,734 @@
+{
+  "artifact_sha256": {
+    "canonical/public/ingestion_summary.json": "8af4998032ae8ed587ea92f7da61d981edfdb7d0d5c7d8e15a92a2154e425135",
+    "canonical/public/products.jsonl": "ecc0610c10d961449bab11617a35ef13d238cb26391d26e9111e167acb1f1641",
+    "demand/public/outlier_records.jsonl": "e058b8a9e230b15acfec7bc4ec2b29bd76a4de4c1e6f8f4024c49efc70347132",
+    "replenishment/public/recommendations.jsonl": "9c259f007c0db672ad28fb37151be43126c0a516e7926cc13a0fff3ef15160b8",
+    "replenishment/public/replenishment_summary.json": "76c1ef59ceb76173a27b5d388c715539c623b841e6a69db4d25f5e8463d7972f"
+  },
+  "cases": {
+    "A": {
+      "evidence": {
+        "evidence_type": "synthetic",
+        "order_quantities": {
+          "baseline": 105.0,
+          "forecast_plus_20_percent": 129.0,
+          "incoming_30_on_oct_02": 75.0,
+          "incoming_30_on_oct_11": 105.0,
+          "lead_6_days": 135.0,
+          "review_10_days": 135.0,
+          "safety_5_days": 135.0,
+          "stock_55": 65.0
+        },
+        "planning_date": "2026-10-01",
+        "unit": "pieces"
+      },
+      "limitations": [
+        "Synthetic inputs only. Categories and external coefficient applicability remain unresolved."
+      ],
+      "status": "PARTIAL"
+    },
+    "B": {
+      "evidence": {
+        "components": {
+          "seasonal_intercepts": [
+            100.0,
+            110.0,
+            120.0,
+            110.0,
+            100.0,
+            130.0,
+            150.0,
+            160.0,
+            110.0,
+            100.0,
+            90.0,
+            80.0
+          ],
+          "seasonality_applied": true,
+          "seasonality_status": "learned_two_cycles",
+          "slope_per_month": 5.0,
+          "training_months": 36
+        },
+        "evidence_type": "synthetic_36_months",
+        "growth_only": [
+          285.0,
+          290.0,
+          295.0
+        ],
+        "history_rule": "100 + 5 * month_index + repeating_12_month_pattern",
+        "holdout_month": "2026-08",
+        "months": [
+          "2026-10",
+          "2026-11",
+          "2026-12"
+        ],
+        "pattern": [
+          0,
+          10,
+          20,
+          10,
+          0,
+          30,
+          50,
+          60,
+          10,
+          0,
+          -10,
+          -20
+        ],
+        "seasonality_and_growth": [
+          295.0,
+          310.0,
+          305.0
+        ],
+        "seasonality_only": [
+          110.0,
+          120.0,
+          110.0
+        ],
+        "selected_model": "trend_seasonal"
+      },
+      "limitations": [
+        "Generated 36-month history; not a claim about accuracy on partner data."
+      ],
+      "status": "PASS"
+    },
+    "C": {
+      "evidence": {
+        "corrected_july": 310,
+        "daily_audit": [
+          {
+            "date": "2026-07-01",
+            "estimated_lost_sales": 10.0,
+            "expected_daily_sales": 10.0,
+            "interval_ids": [
+              "SYN-JULY-STOCKOUT"
+            ],
+            "observed_daily_sales": 0.0,
+            "prior_months": [
+              "2026-04",
+              "2026-05",
+              "2026-06"
+            ],
+            "status": "estimated"
+          },
+          {
+            "date": "2026-07-02",
+            "estimated_lost_sales": 10.0,
+            "expected_daily_sales": 10.0,
+            "interval_ids": [
+              "SYN-JULY-STOCKOUT"
+            ],
+            "observed_daily_sales": 0.0,
+            "prior_months": [
+              "2026-04",
+              "2026-05",
+              "2026-06"
+            ],
+            "status": "estimated"
+          },
+          {
+            "date": "2026-07-03",
+            "estimated_lost_sales": 10.0,
+            "expected_daily_sales": 10.0,
+            "interval_ids": [
+              "SYN-JULY-STOCKOUT"
+            ],
+            "observed_daily_sales": 0.0,
+            "prior_months": [
+              "2026-04",
+              "2026-05",
+              "2026-06"
+            ],
+            "status": "estimated"
+          },
+          {
+            "date": "2026-07-04",
+            "estimated_lost_sales": 10.0,
+            "expected_daily_sales": 10.0,
+            "interval_ids": [
+              "SYN-JULY-STOCKOUT"
+            ],
+            "observed_daily_sales": 0.0,
+            "prior_months": [
+              "2026-04",
+              "2026-05",
+              "2026-06"
+            ],
+            "status": "estimated"
+          },
+          {
+            "date": "2026-07-05",
+            "estimated_lost_sales": 10.0,
+            "expected_daily_sales": 10.0,
+            "interval_ids": [
+              "SYN-JULY-STOCKOUT"
+            ],
+            "observed_daily_sales": 0.0,
+            "prior_months": [
+              "2026-04",
+              "2026-05",
+              "2026-06"
+            ],
+            "status": "estimated"
+          },
+          {
+            "date": "2026-07-06",
+            "estimated_lost_sales": 10.0,
+            "expected_daily_sales": 10.0,
+            "interval_ids": [
+              "SYN-JULY-STOCKOUT"
+            ],
+            "observed_daily_sales": 0.0,
+            "prior_months": [
+              "2026-04",
+              "2026-05",
+              "2026-06"
+            ],
+            "status": "estimated"
+          },
+          {
+            "date": "2026-07-07",
+            "estimated_lost_sales": 10.0,
+            "expected_daily_sales": 10.0,
+            "interval_ids": [
+              "SYN-JULY-STOCKOUT"
+            ],
+            "observed_daily_sales": 0.0,
+            "prior_months": [
+              "2026-04",
+              "2026-05",
+              "2026-06"
+            ],
+            "status": "estimated"
+          },
+          {
+            "date": "2026-07-08",
+            "estimated_lost_sales": 10.0,
+            "expected_daily_sales": 10.0,
+            "interval_ids": [
+              "SYN-JULY-STOCKOUT"
+            ],
+            "observed_daily_sales": 0.0,
+            "prior_months": [
+              "2026-04",
+              "2026-05",
+              "2026-06"
+            ],
+            "status": "estimated"
+          },
+          {
+            "date": "2026-07-09",
+            "estimated_lost_sales": 10.0,
+            "expected_daily_sales": 10.0,
+            "interval_ids": [
+              "SYN-JULY-STOCKOUT"
+            ],
+            "observed_daily_sales": 0.0,
+            "prior_months": [
+              "2026-04",
+              "2026-05",
+              "2026-06"
+            ],
+            "status": "estimated"
+          },
+          {
+            "date": "2026-07-10",
+            "estimated_lost_sales": 10.0,
+            "expected_daily_sales": 10.0,
+            "interval_ids": [
+              "SYN-JULY-STOCKOUT"
+            ],
+            "observed_daily_sales": 0.0,
+            "prior_months": [
+              "2026-04",
+              "2026-05",
+              "2026-06"
+            ],
+            "status": "estimated"
+          },
+          {
+            "date": "2026-07-11",
+            "estimated_lost_sales": 10.0,
+            "expected_daily_sales": 10.0,
+            "interval_ids": [
+              "SYN-JULY-STOCKOUT"
+            ],
+            "observed_daily_sales": 0.0,
+            "prior_months": [
+              "2026-04",
+              "2026-05",
+              "2026-06"
+            ],
+            "status": "estimated"
+          },
+          {
+            "date": "2026-07-12",
+            "estimated_lost_sales": 10.0,
+            "expected_daily_sales": 10.0,
+            "interval_ids": [
+              "SYN-JULY-STOCKOUT"
+            ],
+            "observed_daily_sales": 0.0,
+            "prior_months": [
+              "2026-04",
+              "2026-05",
+              "2026-06"
+            ],
+            "status": "estimated"
+          },
+          {
+            "date": "2026-07-13",
+            "estimated_lost_sales": 10.0,
+            "expected_daily_sales": 10.0,
+            "interval_ids": [
+              "SYN-JULY-STOCKOUT"
+            ],
+            "observed_daily_sales": 0.0,
+            "prior_months": [
+              "2026-04",
+              "2026-05",
+              "2026-06"
+            ],
+            "status": "estimated"
+          },
+          {
+            "date": "2026-07-14",
+            "estimated_lost_sales": 10.0,
+            "expected_daily_sales": 10.0,
+            "interval_ids": [
+              "SYN-JULY-STOCKOUT"
+            ],
+            "observed_daily_sales": 0.0,
+            "prior_months": [
+              "2026-04",
+              "2026-05",
+              "2026-06"
+            ],
+            "status": "estimated"
+          },
+          {
+            "date": "2026-07-15",
+            "estimated_lost_sales": 10.0,
+            "expected_daily_sales": 10.0,
+            "interval_ids": [
+              "SYN-JULY-STOCKOUT"
+            ],
+            "observed_daily_sales": 0.0,
+            "prior_months": [
+              "2026-04",
+              "2026-05",
+              "2026-06"
+            ],
+            "status": "estimated"
+          },
+          {
+            "date": "2026-07-16",
+            "estimated_lost_sales": 10.0,
+            "expected_daily_sales": 10.0,
+            "interval_ids": [
+              "SYN-JULY-STOCKOUT"
+            ],
+            "observed_daily_sales": 0.0,
+            "prior_months": [
+              "2026-04",
+              "2026-05",
+              "2026-06"
+            ],
+            "status": "estimated"
+          },
+          {
+            "date": "2026-07-17",
+            "estimated_lost_sales": 10.0,
+            "expected_daily_sales": 10.0,
+            "interval_ids": [
+              "SYN-JULY-STOCKOUT"
+            ],
+            "observed_daily_sales": 0.0,
+            "prior_months": [
+              "2026-04",
+              "2026-05",
+              "2026-06"
+            ],
+            "status": "estimated"
+          },
+          {
+            "date": "2026-07-18",
+            "estimated_lost_sales": 10.0,
+            "expected_daily_sales": 10.0,
+            "interval_ids": [
+              "SYN-JULY-STOCKOUT"
+            ],
+            "observed_daily_sales": 0.0,
+            "prior_months": [
+              "2026-04",
+              "2026-05",
+              "2026-06"
+            ],
+            "status": "estimated"
+          },
+          {
+            "date": "2026-07-19",
+            "estimated_lost_sales": 10.0,
+            "expected_daily_sales": 10.0,
+            "interval_ids": [
+              "SYN-JULY-STOCKOUT"
+            ],
+            "observed_daily_sales": 0.0,
+            "prior_months": [
+              "2026-04",
+              "2026-05",
+              "2026-06"
+            ],
+            "status": "estimated"
+          },
+          {
+            "date": "2026-07-20",
+            "estimated_lost_sales": 10.0,
+            "expected_daily_sales": 10.0,
+            "interval_ids": [
+              "SYN-JULY-STOCKOUT"
+            ],
+            "observed_daily_sales": 0.0,
+            "prior_months": [
+              "2026-04",
+              "2026-05",
+              "2026-06"
+            ],
+            "status": "estimated"
+          },
+          {
+            "date": "2026-07-21",
+            "estimated_lost_sales": 10.0,
+            "expected_daily_sales": 10.0,
+            "interval_ids": [
+              "SYN-JULY-STOCKOUT"
+            ],
+            "observed_daily_sales": 0.0,
+            "prior_months": [
+              "2026-04",
+              "2026-05",
+              "2026-06"
+            ],
+            "status": "estimated"
+          },
+          {
+            "date": "2026-07-22",
+            "estimated_lost_sales": 10.0,
+            "expected_daily_sales": 10.0,
+            "interval_ids": [
+              "SYN-JULY-STOCKOUT"
+            ],
+            "observed_daily_sales": 0.0,
+            "prior_months": [
+              "2026-04",
+              "2026-05",
+              "2026-06"
+            ],
+            "status": "estimated"
+          },
+          {
+            "date": "2026-07-23",
+            "estimated_lost_sales": 10.0,
+            "expected_daily_sales": 10.0,
+            "interval_ids": [
+              "SYN-JULY-STOCKOUT"
+            ],
+            "observed_daily_sales": 0.0,
+            "prior_months": [
+              "2026-04",
+              "2026-05",
+              "2026-06"
+            ],
+            "status": "estimated"
+          },
+          {
+            "date": "2026-07-24",
+            "estimated_lost_sales": 10.0,
+            "expected_daily_sales": 10.0,
+            "interval_ids": [
+              "SYN-JULY-STOCKOUT"
+            ],
+            "observed_daily_sales": 0.0,
+            "prior_months": [
+              "2026-04",
+              "2026-05",
+              "2026-06"
+            ],
+            "status": "estimated"
+          },
+          {
+            "date": "2026-07-25",
+            "estimated_lost_sales": 10.0,
+            "expected_daily_sales": 10.0,
+            "interval_ids": [
+              "SYN-JULY-STOCKOUT"
+            ],
+            "observed_daily_sales": 0.0,
+            "prior_months": [
+              "2026-04",
+              "2026-05",
+              "2026-06"
+            ],
+            "status": "estimated"
+          },
+          {
+            "date": "2026-07-26",
+            "estimated_lost_sales": 10.0,
+            "expected_daily_sales": 10.0,
+            "interval_ids": [
+              "SYN-JULY-STOCKOUT"
+            ],
+            "observed_daily_sales": 0.0,
+            "prior_months": [
+              "2026-04",
+              "2026-05",
+              "2026-06"
+            ],
+            "status": "estimated"
+          },
+          {
+            "date": "2026-07-27",
+            "estimated_lost_sales": 10.0,
+            "expected_daily_sales": 10.0,
+            "interval_ids": [
+              "SYN-JULY-STOCKOUT"
+            ],
+            "observed_daily_sales": 0.0,
+            "prior_months": [
+              "2026-04",
+              "2026-05",
+              "2026-06"
+            ],
+            "status": "estimated"
+          },
+          {
+            "date": "2026-07-28",
+            "estimated_lost_sales": 10.0,
+            "expected_daily_sales": 10.0,
+            "interval_ids": [
+              "SYN-JULY-STOCKOUT"
+            ],
+            "observed_daily_sales": 0.0,
+            "prior_months": [
+              "2026-04",
+              "2026-05",
+              "2026-06"
+            ],
+            "status": "estimated"
+          },
+          {
+            "date": "2026-07-29",
+            "estimated_lost_sales": 10.0,
+            "expected_daily_sales": 10.0,
+            "interval_ids": [
+              "SYN-JULY-STOCKOUT"
+            ],
+            "observed_daily_sales": 0.0,
+            "prior_months": [
+              "2026-04",
+              "2026-05",
+              "2026-06"
+            ],
+            "status": "estimated"
+          }
+        ],
+        "estimated_lost_sales": 290,
+        "evidence_type": "synthetic_interval_and_sales",
+        "forecast_after": 306.6666666666667,
+        "forecast_before": 210.0,
+        "observed_july": 20,
+        "order_after": 104.0,
+        "order_before": 67.0,
+        "real_intervals_supplied": false,
+        "unit": "pieces"
+      },
+      "limitations": [
+        "Synthetic stockout intervals; real intervals were not supplied."
+      ],
+      "status": "PASS"
+    },
+    "D": {
+      "evidence": {
+        "allowed_relative_inflation": 0.01,
+        "baseline_forecast": 200.0,
+        "cleaned_forecast": 200.0,
+        "evidence_type": "synthetic_transactions_through_cleaning_forecast_and_order",
+        "injected_quantity": 9000,
+        "injection_month": "2026-08",
+        "normal_documents": 400,
+        "observed_relative_inflation": 0.0,
+        "order_quantities": {
+          "baseline": 63.0,
+          "with_screening": 63.0,
+          "without_screening": 1224.0
+        },
+        "threshold": 80.0,
+        "unit": "pieces",
+        "unscreened_forecast": 3200.0
+      },
+      "limitations": [
+        "Generated one-off document. Customer IDs are absent and customer grouping is not implemented."
+      ],
+      "status": "PARTIAL"
+    },
+    "E": {
+      "evidence": {
+        "csv_and_json_verified": true,
+        "edit_revokes_review": true,
+        "evidence_type": "AppTest_with_synthetic_records",
+        "human_approval_performed": false,
+        "reason_required": true,
+        "recommended_quantities": [
+          105,
+          105
+        ],
+        "review_required": true,
+        "reviewed_draft_quantities": [
+          110,
+          105
+        ],
+        "sent_to_supplier": false,
+        "stale_line_removed": true,
+        "suppliers": [
+          "IEK",
+          "SystemElectric"
+        ],
+        "unrelated_line_preserved": true,
+        "visual_browser_qa": "not_performed_no_browser_connector"
+      },
+      "limitations": [
+        "Session review only. No supplier transmission; exact 1C import format is unverified."
+      ],
+      "status": "PASS"
+    }
+  },
+  "execution_status": "PASS",
+  "input_files_unchanged": true,
+  "not_a_business_approval": true,
+  "real_examples": {
+    "IEK": {
+      "baseline_order": 105.0,
+      "calculation": {
+        "available_stock": 15.0,
+        "effective_rounding_step": 1.0,
+        "first_shortage_with_order": "2026-10-02",
+        "first_shortage_without_order": "2026-10-02",
+        "forecast_demand": 100.0,
+        "incoming_supply_ignored_timing": 0,
+        "incoming_supply_used": 0.0,
+        "lead_time_days": 3,
+        "minimum_stock_units": null,
+        "multiple_stock_units": null,
+        "net_requirement": 105.0,
+        "new_order_arrival_date": "2026-10-04",
+        "peak_shortage_before_new_order": 15.0,
+        "protection_days": 10,
+        "protection_end_exclusive": "2026-10-11",
+        "review_period_days": 7,
+        "rounding_increment": 0.0,
+        "safety_days": 2,
+        "safety_stock": 20.0,
+        "stock_quantity_increment": 1.0,
+        "target_stock": 120.0,
+        "timing_requirement": 85.0,
+        "unrounded_requirement": 105.0
+      },
+      "incoming_order": 35.0,
+      "incoming_value": 30,
+      "sku": "SYN-IEK-001",
+      "stock_order": 65.0,
+      "stock_value": 55
+    },
+    "evidence_type": "public_synthetic",
+    "real_outlier_candidate": {
+      "assumption_ids": [
+        "ACCEPTANCE-SYNTHETIC-V1",
+        "DEMAND-DOCUMENT-PROXY-V1",
+        "DEMAND-EVENT-DATE-AVAILABILITY-V1",
+        "DEMAND-NEGATIVE-UNRESOLVED-V1",
+        "DEMAND-POSITIVE-OBSERVED-V1",
+        "DEMAND-ROBUST-THRESHOLDS-V1"
+      ],
+      "baseline": {
+        "fences": {
+          "iqr": 10.0,
+          "mad": 10.0,
+          "median_ratio": 80.0
+        },
+        "history_days": 200,
+        "history_documents": 200,
+        "history_end": "2026-08-20",
+        "history_start": "2025-11-01",
+        "mad": 0.0,
+        "median": 10.0,
+        "q1": 10.0,
+        "q3": 10.0,
+        "quantity_to_median": 900.0,
+        "similar_days": 0,
+        "similar_documents": 0,
+        "threshold": 80.0
+      },
+      "cleaning_status": "flagged_one_off_candidate",
+      "date": "2026-08-28",
+      "document_id": "f28ab8eb0782023804bcae7ee74a5dfd3bfc75e9f4a8bd40e5e0cfbd40c78ac0",
+      "document_number": "SYN-IEK-004-injected",
+      "is_outlier": true,
+      "is_synthetic": true,
+      "missing_document_identifier": false,
+      "missing_quantity_rows": 0,
+      "outlier_reason": "Quantity exceeds all robust fences; insufficient prior comparable repeats",
+      "outlier_score": 112.5,
+      "qty_positive_raw": 9000.0,
+      "qty_raw": 9000.0,
+      "qty_regular": 0.0,
+      "quality_flags": [],
+      "sku_id": "SYN-IEK-004",
+      "source_id": "iek_transactions",
+      "source_rows": [
+        1
+      ],
+      "source_sheet": "Synthetic acceptance",
+      "stock_uom": "шт",
+      "supplier_id": "IEK",
+      "transaction_ids": [
+        "SYN-IEK-004-injected"
+      ],
+      "warehouse_id": "SYN-WAREHOUSE"
+    },
+    "recommendation_sha256": "9c259f007c0db672ad28fb37151be43126c0a516e7926cc13a0fff3ef15160b8",
+    "replenishment_run": "public"
+  },
+  "registered_workbooks_verified": 0,
+  "scope": "public_synthetic",
+  "source_text_sha256": {
+    "app.py": "8d13d134b52b62d0f449fca32c93515e777bdb4c36e904e25d6987286e5b61f0",
+    "config/demand.json": "dff30633e0d0ff4dc3dca8a99a02922329dfe868c32bc0a77420c5c6a0e6cd8b",
+    "config/forecast.json": "edd3a6b1ce8d91f619030bcd00aaf319fa25f49965782e0fb388b5e8596c9f34",
+    "config/replenishment.json": "31d5e33ab7553d6c4d33196f3cdfc0b2b7f38f8f437f8be2258dc1febf2ef42c",
+    "docs/CASE.md": "0f0934840d4441515bdc4a4ac6e9976e2543b81590117ca56287d7be826e8f1a",
+    "scripts/accept_case.py": "79a01a816a1f93e1d48ffcf10f246efe87b110c7997f3372726e688de05e98e4",
+    "scripts/build_demo.py": "25a79a7fa49ccf1e4e4b42bec0a973657840d128699f624ec96ad107b9ae90ba",
+    "src/vector_pipeline/__init__.py": "3cbb2092e635125eff27eb85e2a3601cd9b0ec9a2226fccf87b2bf79f1a93618",
+    "src/vector_pipeline/adapters.py": "b48d91e645d121e794b9f8f4ca6448430578f9663ea1bc84b8f3f3c32ac433b0",
+    "src/vector_pipeline/cli.py": "28ab371a03d5455226e629378941dbd855e82f087ca3fa238978fadd812c60e4",
+    "src/vector_pipeline/config.py": "cda8bfd8904dd3b8886645214784b6f914a2952696a8b3078caefa2777906227",
+    "src/vector_pipeline/dashboard.py": "7f56b40bf3ddadee2566ef2a0c1de920cce094acb19095f3fe8559abd927b284",
+    "src/vector_pipeline/demand.py": "a5655c93879ca993869b60c92d5531458dd4d0d7360fe0d54981c83b6a4b6a1e",
+    "src/vector_pipeline/demand_cli.py": "503fe081c6571afa49c9c78881589a36e697123fc6bdc51849a7724116bf4634",
+    "src/vector_pipeline/evidence.py": "b2268ff2ef031775447a013f8d9dd798cdc4fcea3860fc54882d974196e60b7f",
+    "src/vector_pipeline/evidence_ui.py": "75f759c25d4028637ef14b4efcf52dd6e36973f0dd462a34d66aede63c5604d1",
+    "src/vector_pipeline/forecast.py": "599592f7bc2738b76ea44293027acd1365fd4e672b9e3559d185b6e40049d985",
+    "src/vector_pipeline/forecast_cli.py": "80c23ec2325a420d98b94cabe7ac5060644d0bf3e7d40b9bada1bcb0d1937a7e",
+    "src/vector_pipeline/i18n.py": "659b9b9de30355ca56d1b487cc8743a7c3b8502b2ee1383ba91046e930aff316",
+    "src/vector_pipeline/parsing.py": "183e99a03c1904c0ebd9f5ee6a719749c1b9b02dbe8fa2502c4a331372325827",
+    "src/vector_pipeline/pipeline.py": "332de40e5ff165345c4cd9fa0cd9e787ee51eedb5cb517dbe9b605420c4d6cd0",
+    "src/vector_pipeline/reconciliation.py": "0836a74166f1c7c695d142d193ac85c4661db3900275bd27a21a723add8c98f3",
+    "src/vector_pipeline/replenishment.py": "7e9df66328b0d8156e53e6058b91bf30717b644877b6532042c80707fe8e476c",
+    "src/vector_pipeline/replenishment_cli.py": "c0757826d4767e3b26eeef1385c6bb6c95f76ab14941879502a9b3c1bbf0eb48",
+    "src/vector_pipeline/schema.py": "515ed5b2e0cd1887d0d48f73944c219f3dbb2ca5408ae65194573ec684771c95",
+    "src/vector_pipeline/stockout.py": "7e1f5e771038633dd1eb633bfdbf8d01b6cfe5e1cbfc33b8c836efa2e5c9e8a6"
+  },
+  "version": 1
+}

@@ -46,7 +46,8 @@ def render_evidence(root, processed, summary, navigate):
     except (OSError, ValueError, KeyError, TypeError) as exc:
         st.warning(error_text(exc, language))
         st.info(t('Regenerate evidence before presenting this screen. No saved PASS claims are shown until the report matches the current code and inputs.'))
-        st.code(".venv/Scripts/python.exe -X utf8 scripts/accept_case.py", language="powershell")
+        script = "build_demo.py" if summary.get("mode") == "public_synthetic" else "accept_case.py"
+        st.code(f"python scripts/{script}", language="bash")
         return
     if report.get("execution_status") != "PASS" or any(c["status"] == "FAIL" for c in report["cases"].values()):
         st.error(t('The latest acceptance run has failed checks. Resolve them before using this page for the jury.'))
@@ -54,6 +55,7 @@ def render_evidence(root, processed, summary, navigate):
         return
 
     cases, real = report["cases"], report["real_examples"]
+    synthetic = report.get("scope") == "public_synthetic"
     a, b, c, d, e = (cases[key]["evidence"] for key in "ABCDE")
     iek = real["IEK"]
     same_run = summary["tables"]["recommendations.jsonl"]["sha256"] == real["recommendation_sha256"]
@@ -65,9 +67,10 @@ def render_evidence(root, processed, summary, navigate):
 
     left, right = st.columns(2, gap="medium")
     with left, st.container(border=True):
-        card("A", t('Replenishment responds'), cases["A"], t('Real sales · scenario stock and receipts'),
-             " → ".join(quantity(iek[k]) for k in ("baseline_order", "stock_200_order", "stock_200_incoming_100_order")),
-             t('IEK {v0} · original → stock 200 → incoming 100 · шт', v0=iek['sku']),
+        order_keys = ("baseline_order", "stock_order", "incoming_order") if synthetic else ("baseline_order", "stock_200_order", "stock_200_incoming_100_order")
+        card("A", t('Replenishment responds'), cases["A"], t('Synthetic sales, stock and receipts' if synthetic else 'Real sales · scenario stock and receipts'),
+             " → ".join(quantity(iek[k]) for k in order_keys),
+             t('IEK {sku} · original → stock {stock} → incoming {incoming}', sku=iek['sku'], stock=iek.get('stock_value', 200), incoming=iek.get('incoming_value', 100)),
              t('PARTIAL: categories are missing; external coefficient applicability is unconfirmed. Neither is applied.'))
         x, y = st.columns(2)
         x.button(t('Open IEK calculation'), on_click=navigate, args=("Order planning", "IEK", iek["sku"], "Order explanation"),
@@ -92,11 +95,11 @@ def render_evidence(root, processed, summary, navigate):
         st.button(t('Stockout proof'), on_click=proof, args=("C",), width="stretch")
     with right, st.container(border=True):
         amounts = d["order_quantities"]
-        card("D", t('One-off order protection'), cases["D"], t('Synthetic injection · real candidate available below'),
+        card("D", t('One-off order protection'), cases["D"], t('Synthetic injection · generated candidate below' if synthetic else 'Synthetic injection · real candidate available below'),
              t('{v0} → {v1}', v0=quantity(amounts['baseline']), v1=quantity(amounts['with_screening'])),
              t('Inject +{v0} units · without cleaning: {v1}', v0=quantity(d['injected_quantity']), v1=quantity(amounts['without_screening'])),
              t('PARTIAL: client_id is absent. The detector groups documents; customer-level grouping is not implemented.'))
-        st.button(t('One-off proof + real candidate'), on_click=proof, args=("D",), width="stretch")
+        st.button(t('One-off proof + synthetic candidate' if synthetic else 'One-off proof + real candidate'), on_click=proof, args=("D",), width="stretch")
 
     with st.container(border=True):
         left, right = st.columns([3, 1])
@@ -116,7 +119,7 @@ def render_evidence(root, processed, summary, navigate):
                       key="evidence_detail", label_visibility="collapsed")
     if detail == "A":
         calc = iek["calculation"]
-        st.write(t('**Real sales / scenario inventory — IEK {v0}**', v0=iek['sku']))
+        st.write(t('**Synthetic example — IEK {v0}**' if synthetic else '**Real sales / scenario inventory — IEK {v0}**', v0=iek['sku']))
         st.write(t('{v0} forecast + {v1} safety − {v2} available − {v3} incoming = {v4} net. After timing checks and rounding: {v5} шт.', v0=quantity(calc['forecast_demand']), v1=quantity(calc['safety_stock']), v2=quantity(calc['available_stock']), v3=quantity(calc['incoming_supply_used']), v4=quantity(calc['net_requirement']), v5=quantity(iek['baseline_order'])))
         st.caption(t('Opening the example shows its current session values; the proof above records the audited scenario before your edits.'))
         with st.expander(t('Synthetic sensitivity checks')):
@@ -153,10 +156,10 @@ def render_evidence(root, processed, summary, navigate):
             tooltip=[alt.Tooltip("Scenario:N", title=t("Scenario")), alt.Tooltip("Order:Q", title=t("Order"))]).properties(height=155), width="stretch")
         st.caption(t('Observed inflation: {v0:.0%}; preset fixture limit: {v1:.0%}. This bound is not a universal accuracy guarantee.', v0=d['observed_relative_inflation'], v1=d['allowed_relative_inflation']))
         candidate = real["real_outlier_candidate"]
-        st.write(t('**Real candidate — {v0} · {v1} · {v2}**', v0=candidate['supplier_id'], v1=candidate['sku_id'], v2=candidate['date']))
+        st.write(t('**Synthetic candidate — {v0} · {v1} · {v2}**' if synthetic else '**Real candidate — {v0} · {v1} · {v2}**', v0=candidate['supplier_id'], v1=candidate['sku_id'], v2=candidate['date']))
         st.write(t('Raw **{v0}** → regular **{v1}** {v2}; prior median **{v3}**, threshold **{v4}**.', v0=quantity(candidate['qty_raw']), v1=quantity(candidate['qty_regular']), v2=candidate['stock_uom'], v3=quantity(candidate['baseline']['median']), v4=quantity(candidate['baseline']['threshold'])))
         st.caption(t('A flagged candidate is not a verified customer anomaly. Document ID is not customer identity; customer-level screening requires data and implementation work.'))
-        with st.expander(t('Candidate provenance and prior-history baseline')):
+        with st.expander(t('Technical audit')):
             st.json(candidate)
     else:
         checks = {"Manual adjustment requires a reason": e["reason_required"], "Review required before reviewed export": e["review_required"],

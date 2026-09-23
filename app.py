@@ -10,7 +10,7 @@ import altair as alt
 import pandas as pd
 import streamlit as st
 
-from vector_pipeline.dashboard import (discover_runs, draft_line, export_draft, fingerprint,
+from vector_pipeline.dashboard import (discover_runs, draft_line, export_draft, fingerprint, select_processed,
     load_products, load_run, review_draft, review_is_current, scenario)
 from vector_pipeline.evidence_ui import render_evidence
 from vector_pipeline.i18n import translate, localize_frame, error_text
@@ -35,7 +35,7 @@ h2,h3 {letter-spacing:-.5px!important}
 </style>""", unsafe_allow_html=True)
 
 ROOT = Path(__file__).resolve().parent
-PROCESSED = Path(os.environ.get("VECTOR_PROCESSED_ROOT", str(ROOT / "data" / "processed")))
+PROCESSED = select_processed(ROOT, os.environ.get("VECTOR_PROCESSED_ROOT"))
 URGENCY = {"expedite_or_transfer": "Earlier supply needed", "order_now": "Order now",
            "no_order_needed": "Covered", "unavailable": "Missing inputs"}
 
@@ -83,8 +83,8 @@ with st.sidebar:
         st.info(t('Create a replenishment run to start. See README → Replenishment v1.'))
         st.stop()
     selected_run = st.selectbox(t('Calculation run'), runs, format_func=lambda r:
-        f"{t('Scenario' if r['mode'] == 'demo_scenario' else 'Explicit inputs')} · {r['planning_date']} · {Path(r['path']).name[:6]}", key="calculation_run")
-    st.caption(t('Local workspace · No supplier connection'))
+        f"{t('Public demo' if r['mode'] == 'public_synthetic' else 'Scenario' if r['mode'] == 'demo_scenario' else 'Explicit inputs')} · {r['planning_date']}", key="calculation_run")
+    st.caption(t('Review workspace · No supplier connection'))
 
 run_path = Path(selected_run["path"])
 try:
@@ -123,11 +123,16 @@ def table_row(row):
 st.markdown(f'<div class="eyebrow">{t("ELECTROKOMPLEKT / DECISION WORKSPACE")}</div>', unsafe_allow_html=True)
 st.title(t(page))
 scenario_count = sum(r["recommendation_status"] == "scenario" for r in rows)
+public_demo = summary["mode"] == "public_synthetic"
+if public_demo:
+    st.info(t('PUBLIC DEMO · All products, sales, stock and receipts are synthetic. No partner business records are included.'))
 if page == "Case validation":
     st.caption(t('Why Vector works · Before / after evidence for the five HackAlem requirements'))
 else:
     st.caption(t('Planning date: {v0}  ·  {v1:,} SKU series  ·  Warehouse and stock units preserved', v0=summary['planning_date'], v1=len(rows)))
-if page != "Case validation" and (summary["mode"] == "demo_scenario" or scenario_count):
+if public_demo:
+    pass
+elif page != "Case validation" and (summary["mode"] == "demo_scenario" or scenario_count):
     st.markdown(f'<div class="scenario-note"><b>{t("SCENARIO WORKSPACE")}</b> &nbsp; {t("Real sales forecasts with assumed stock, supplier times and supply coverage. Quantities and shortage alerts are scenario results, not confirmed purchasing needs.")}</div>', unsafe_allow_html=True)
 elif page != "Case validation":
     st.info(t('Explicit-input mode: quantities remain unavailable wherever operational inputs are unresolved.'))
@@ -139,12 +144,12 @@ def show_projection(row):
     timeline = pd.DataFrame(row["timeline"])
     long = timeline.melt(id_vars=["date"], value_vars=["balance_without_order", "balance_with_order"],
                          var_name="Plan", value_name="Projected balance")
-    long["Plan"] = long["Plan"].map({"balance_without_order": t("Existing supply"), "balance_with_order": t("With recommended order")})
+    long["Plan"] = long["Plan"].map({"balance_without_order": t("Existing plan"), "balance_with_order": t("With new order")})
     chart = alt.Chart(long).mark_line(strokeWidth=2.5).encode(
         x=alt.X("date:T", title=None, axis=alt.Axis(format="%d.%m")),
         y=alt.Y("Projected balance:Q", title=t("Projected balance ({unit})", unit=row['stock_uom'])),
-        color=alt.Color("Plan:N", scale=alt.Scale(domain=[t("Existing supply"), t("With recommended order")],
-            range=["#D18B49", "#087F71"]), legend=alt.Legend(orient="bottom", title=None)),
+        color=alt.Color("Plan:N", scale=alt.Scale(domain=[t("Existing plan"), t("With new order")],
+            range=["#D18B49", "#087F71"]), legend=alt.Legend(orient="bottom", title=None, labelLimit=250)),
         tooltip=[alt.Tooltip("date:T", title=t("Date")), alt.Tooltip("Plan:N", title=t("Plan")), alt.Tooltip("Projected balance:Q", title=t("Projected balance"), format=",.2f")])
     zero = alt.Chart(pd.DataFrame({"zero": [0]})).mark_rule(color="#9CAABB", strokeDash=[4, 4]).encode(y="zero:Q")
     st.altair_chart((chart + zero).properties(height=275), width="stretch")
@@ -252,20 +257,23 @@ def show_details(row):
                 "Mean baseline": f.get("baseline_forecast_qty"), "Model": f["model"],
                 "As of": f["as_of_date"]} for f in forecasts]), language), hide_index=True, width="stretch")
         st.caption(t('Seasonality and growth are included in the model where supported; they are not added a second time. Category and customer IDs are unavailable in the supplied data.'))
-        with st.expander(t('Input values, evidence and assumptions')):
+        st.write(t('Forecast source: synthetic sales' if public_demo else 'Forecast source: real regular observed sales'))
+        st.write(t('Stock: {stock}; supplier lead time: {lead}; incoming: {incoming}.',
+            stock=t(row['inputs']['available_stock']['status']), lead=t(row['inputs']['lead_time_days']['status']),
+            incoming=t(row['inputs']['incoming']['status'])))
+        st.write(t('Supplier constraints are applied only when explicitly resolved. Real stockout intervals are unavailable.'))
+        with st.expander(t('Technical audit')):
             st.caption(t("Audit keys, source values and CSV/JSON exports retain their original language and schema."))
             st.json(row["inputs"])
             st.write(t('Assumption IDs'), row["assumption_ids"])
-        with st.expander(t('Incoming supply and ordering constraints')):
             st.json({"incoming": row["incoming_audit"], "constraints": row["constraint_audit"]})
-        with st.expander(t('Product identity and source references')):
             st.json(info or {"sku_id": row["sku_id"], "product_dimension": "unavailable"})
 
 
 if page == "Order planning":
     a, b, c, d = st.columns(4)
     a.metric(t('Ready for review'), f"{sum(r['recommended_quantity'] is not None for r in rows):,}")
-    b.metric(t('Earlier supply needed'), f"{sum(r['urgency'] == 'expedite_or_transfer' for r in rows):,}")
+    b.metric(t('Early shortage (scenario)' if scenario_count else 'Earlier supply needed'), f"{sum(r['urgency'] == 'expedite_or_transfer' for r in rows):,}")
     c.metric(t('Missing inputs'), f"{sum(r['recommendation_status'] == 'unavailable' for r in rows):,}")
     d.metric(t('Draft lines'), len(st.session_state.cart))
     st.caption(t('Counts cover the entire selected run, including session edits. Each series is a supplier / SKU / warehouse / unit combination.'))
@@ -351,11 +359,14 @@ else:
     st.dataframe(localize_frame(pd.DataFrame([{"Reason": k, "Series": v} for k, v in reasons.most_common()]), language), hide_index=True, width="stretch")
     st.markdown(t("**Evidence limits on the supplied dataset**"))
     st.write(t('Current available stock, supplier lead times and actual stockout intervals have not been confirmed. Category and customer IDs are missing. Historical monthly stock is not treated as current stock, and document IDs are not customer IDs.'))
-    st.write(t('Forecast v1 uses regular observed sales. Model selection used rolling historical origins before the final August 2026 holdout. On that holdout, the selected policy lost to the mean baseline for IEK and SystemElectric pieces; it improved IEK meters and packs. No inventory-cost improvement has been established.'))
-    st.write(t('The real data provide at most 20 consecutive complete months. Two-cycle trend/seasonality fitting is not established on those series; synthetic tests verify that the forecasting and stockout mechanisms work.'))
+    if public_demo:
+        st.write(t('This demo contains 40 generated SKU series across two suppliers, including seasonal growth, dated receipts, covered stock and missing-input examples. It is not a measurement of partner demand or model accuracy.'))
+    else:
+        st.write(t('Forecast v1 uses regular observed sales. Model selection used rolling historical origins before the final August 2026 holdout. On that holdout, the selected policy lost to the mean baseline for IEK and SystemElectric pieces; it improved IEK meters and packs. No inventory-cost improvement has been established.'))
+        st.write(t('The real data provide at most 20 consecutive complete months. Two-cycle trend/seasonality fitting is not established on those series; synthetic tests verify that the forecasting and stockout mechanisms work.'))
     st.caption(t('These findings describe the supplied project dataset, not a newly measured score for every selected run. See README and the forecast/replenishment policies for the audited results.'))
-    with st.expander(t('Run provenance')):
+    with st.expander(t('Technical audit')):
         st.json({k: summary.get(k) for k in ("mode", "planning_date", "input_sha256", "code_sha256", "tables")})
 
 st.divider()
-st.caption(t('VECTOR · Run {v0} · {v1} edited SKU scenario(s) · Session drafts reset when the calculation run changes.', v0=run_path.name, v1=len(st.session_state.overrides)))
+st.caption(t('VECTOR · {count} edited SKU scenario(s) · Drafts belong to this browser session.', count=len(st.session_state.overrides)))

@@ -8,6 +8,11 @@ def _hash(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def text_hash(path):
+    """Portable source fingerprint across Git CRLF/LF checkouts."""
+    return hashlib.sha256(Path(path).read_bytes().replace(b"\r\n", b"\n")).hexdigest()
+
+
 def _within(root, relative):
     path = (root / str(relative).replace("\\", "/")).resolve()
     if not path.is_relative_to(root.resolve()):
@@ -34,6 +39,20 @@ def load_acceptance(root, processed):
             raise ValueError("Unknown acceptance status")
     if not report.get("input_files_unchanged") or not report.get("not_a_business_approval"):
         raise ValueError("Acceptance provenance is incomplete")
+    if report.get("scope") == "public_synthetic":
+        required = {f"src/vector_pipeline/{name}.py" for name in ("demand", "forecast", "stockout", "replenishment")}
+        expected = report["source_text_sha256"]
+        if not required.issubset(expected):
+            raise ValueError("Acceptance report omits core calculation fingerprints")
+        for relative, wanted in expected.items():
+            file = _within(root, relative)
+            if not file.is_file() or text_hash(file) != wanted:
+                raise ValueError(f"Acceptance report is stale: {relative}")
+        for relative, wanted in report["artifact_sha256"].items():
+            file = _within(processed, relative)
+            if not file.is_file() or _hash(file) != wanted:
+                raise ValueError("Acceptance source artifact changed or is missing")
+        return report, path, raw
     expected = {k.replace("\\", "/"): v for k, v in report["unchanged_input_sha256"].items()}
     required = {f"src/vector_pipeline/{name}.py" for name in ("demand", "forecast", "stockout", "replenishment")}
     if not required.issubset(expected):

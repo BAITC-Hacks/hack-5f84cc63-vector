@@ -1,0 +1,2 @@
+# Keep hash-verified demo artifacts byte-identical on Windows and Linux.
+demo/** text eol=lf

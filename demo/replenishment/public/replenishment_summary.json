@@ -1,0 +1,30 @@
+{
+  "effective_config": {
+    "policies": {
+      "daily_allocation": {
+        "id": "ORDER-UNIFORM-DAILY-V1",
+        "reason": "Allocate each monthly forecast uniformly over calendar days; intra-month profile is unknown.",
+        "status": "scenario"
+      },
+      "numeric_tolerance": 1e-09,
+      "unmet_demand_policy": {
+        "id": "ORDER-BACKLOG-PROJECTION-V1",
+        "reason": "Negative projected inventory represents cumulative unmet demand carried forward, not measured lost sales.",
+        "status": "scenario"
+      }
+    }
+  },
+  "input_sha256": {
+    "ingestion_summary": "8af4998032ae8ed587ea92f7da61d981edfdb7d0d5c7d8e15a92a2154e425135"
+  },
+  "is_synthetic": true,
+  "mode": "public_synthetic",
+  "planning_date": "2026-10-01",
+  "status": "complete",
+  "tables": {
+    "recommendations.jsonl": {
+      "rows": 40,
+      "sha256": "9c259f007c0db672ad28fb37151be43126c0a516e7926cc13a0fff3ef15160b8"
+    }
+  }
+}

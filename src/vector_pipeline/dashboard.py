@@ -47,6 +47,14 @@ def checked_table(path, metadata):
     return rows
 
 
+def select_processed(root, override=None):
+    """Prefer private completed runs; a clean checkout uses the public demo."""
+    private = Path(override) if override else Path(root) / "data" / "processed"
+    if discover_runs(private / "replenishment"):
+        return private
+    return Path(root) / "demo"
+
+
 def load_run(path):
     path = Path(path)
     summary = json.loads((path / "replenishment_summary.json").read_text(encoding="utf-8"))

@@ -1,5 +1,25 @@
 # Vector: four-minute jury walkthrough
 
+## Public hosted demo: no private data required
+
+Public mode displays **ПУБЛИЧНОЕ ДЕМО** and 40 generated SKU series. All examples are
+synthetic, including the candidate in case D. Never present these as partner observations.
+The full-data laptop walkthrough below uses different SKU codes and quantities.
+
+| Time | Exact action and result |
+|---|---|
+| 0:00–0:50 | Open **Проверка кейса**. A: **105 → 65 → 35**; B: **+5** units/month; C: **67 → 104**; D: **63 / 63 / 1,224**. Explain the two **ЧАСТИЧНО** statuses. |
+| 0:50–1:50 | Click **Открыть расчёт IEK** (SYN-IEK-001). In **Что если?**, set stock **55**, leave lead **3**, review **7**, safety **2**. Enter a reason, click **Пересчитать SKU**: **65**. Add incoming **30** arriving **2026-10-02**, recalculate: **35**. |
+| 1:50–2:40 | Return to **Проверка кейса**. Open the seasonal, stockout and one-off proofs. Every source label says synthetic; no real customer identity is implied. |
+| 2:40–3:40 | Open IEK again, set draft quantity **40** and enter a manual-change reason. Add to draft. Clear search, choose SystemElectric and SYN-SE-001 (recommended **105**), add it. Open **Проверка черновика**, show two supplier groups, enter a reviewer name, acknowledge, click **Подтвердить проверку черновика**, download CSV. |
+| 3:40–4:00 | Show **Качество данных** and explain remaining real-source gaps. Say: the hosted version demonstrates the algorithm; the private version uses supplied sales and clearly marked operational assumptions. |
+
+The bundle is already generated. Do not run the full suite before every rehearsal.
+After code changes, `python scripts/build_demo.py` refreshes this synthetic evidence;
+`python -m unittest discover -s tests -p test_public_demo.py -q` is the focused smoke check.
+
+## Private laptop demonstration
+
 **Claim:** explainable supplier orders, with acceptance evidence and manager review.
 Real sales drive the main workflow; stock, supplier times and incomplete supply coverage
 are explicitly **scenario assumptions**. No measured savings claim.
@@ -9,12 +29,10 @@ are explicitly **scenario assumptions**. No measured savings claim.
 From the project root, with dashboard dependencies installed:
 
 ```powershell
-.venv/Scripts/python.exe -m unittest discover -s tests -q
-.venv/Scripts/python.exe -X utf8 scripts/accept_case.py
 .venv/Scripts/python.exe -m streamlit run app.py
 ```
 
-Expected: **91 tests OK**; A/D PARTIAL, B/C/E PASS. Re-run acceptance after code changes:
+Expected: A/D PARTIAL, B/C/E PASS. Re-run `scripts/accept_case.py` only when its saved evidence is stale after code changes:
 the evidence page rejects stale reports. Internet and NVIDIA APIs are not needed after
 installation. Open http://127.0.0.1:8501 in a fresh session. Select **Сценарий · 2026-10-01**
 with **992 / 941 / 1,724** ready / earlier supply / missing-input series. Identical replays
