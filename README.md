@@ -2,7 +2,7 @@
 
 # Vector — AI Procurement Copilot
 
-**[English version ↓](#english)** · [Запуск в Docker](#docker-ru) · [Демо за 4 минуты](DEMO.md) · [Методология](#methods-ru)
+**[English version ↓](#english)** · [С Docker](#docker-ru) · [Без Docker](#quickstart-ru) · [Демо за 4 минуты](DEMO.md) · [Методология](#methods-ru)
 
 **Из выгрузок продаж, остатков и поставок — в понятный черновик заказа поставщику.**
 
@@ -97,16 +97,43 @@ flowchart LR
 
 ## Запуск без Docker
 
-Из корня репозитория, в Python 3.11+ (проверено на 3.14):
+Нужны **Git и Python 3.11+** (локально проверено на 3.14). Выберите команды для своей
+системы. Если репозиторий уже скачан, пропустите `git clone` и перейдите в его папку.
+
+### Windows — PowerShell
+
+```powershell
+git clone https://github.com/BAITC-Hacks/hack-5f84cc63-vector.git
+cd hack-5f84cc63-vector
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -e ".[dashboard]"
+.\.venv\Scripts\python.exe -m streamlit run app.py --server.address=127.0.0.1 --server.port=8501
+```
+
+### Linux / macOS
 
 ```bash
-pip install -e ".[dashboard]"
-streamlit run app.py
+git clone https://github.com/BAITC-Hacks/hack-5f84cc63-vector.git
+cd hack-5f84cc63-vector
+python3 -m venv .venv
+./.venv/bin/python -m pip install -e ".[dashboard]"
+./.venv/bin/python -m streamlit run app.py --server.address=127.0.0.1 --server.port=8501
 ```
 
 Откройте **http://localhost:8501**. Исходные Excel и API-ключи для демо не нужны.
 Интерфейс по умолчанию русский; переключатель **RU / EN** находится слева.
 Смена языка сохраняет сценарий, черновик и отметку о проверке.
+
+**Остановка:** `Ctrl+C` в терминале приложения. **Повторный запуск:** только последняя
+команда для своей системы из папки проекта; заново устанавливать зависимости не нужно.
+Активировать виртуальное окружение не требуется. Для первой установки зависимостей нужен интернет.
+
+| Проблема | Что сделать |
+|---|---|
+| `python` / `python3` не найден | Установите Python 3.11+; на Windows включите добавление Python в PATH и откройте новый терминал. Если доступен `py`, создайте окружение командой `py -3 -m venv .venv`. |
+| На Linux недоступен `venv` | Установите пакет виртуальных окружений для своей версии Python; в Ubuntu/Debian обычно `sudo apt install python3-venv`. |
+| Порт 8501 занят | В команде запуска без Docker замените `--server.port=8501` на `--server.port=8502` и откройте http://localhost:8502. Для Docker используйте замену порта из раздела выше. |
+| Docker сообщает `Cannot connect` / `daemon is not running` | Запустите Docker Desktop / Docker Engine или используйте инструкции без Docker. |
 
 Основной способ передачи MVP — локальный Docker. Публичный деплой не выполняется.
 
@@ -183,13 +210,15 @@ docker run --rm --name vector-private -p 127.0.0.1:8501:8501 --mount "type=bind,
 
 ## English
 
-**[Русская версия ↑](#russian)** · [Four-minute demo](DEMO.md)
+**[Русская версия ↑](#russian)** · [Docker](#docker-en) · [Without Docker](#quickstart-en) · [Four-minute demo](DEMO.md)
 
 **Turn sales, inventory and incoming-supply exports into an explained supplier order draft.**
 
 Vector helps purchasing managers decide **what to order, how much and why**.
 It replaces manual spreadsheet consolidation with per-item recommendations, transparent
 calculations and manager review before export. Built for **HackAlem AI · Electrokomplekt**.
+
+<a id="docker-en"></a>
 
 ### Quick start for jury and administrators — Docker
 
@@ -260,15 +289,46 @@ Keep lead time at 3 days, review period at 7 and safety at 2. These figures are
 Private completed runs take priority. Without them, the app automatically opens the bundled
 demo. **Commit `demo/`; keep partner Excel and private processed data out of GitHub.**
 
-From the repository root, using Python 3.11+ (checked on 3.14):
+<a id="quickstart-en"></a>
+
+### Run without Docker
+
+Install **Git and Python 3.11+** (locally checked on 3.14). If you already cloned the
+repository, skip `git clone` and enter the existing project directory.
+
+**Windows — PowerShell:**
+
+```powershell
+git clone https://github.com/BAITC-Hacks/hack-5f84cc63-vector.git
+cd hack-5f84cc63-vector
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -e ".[dashboard]"
+.\.venv\Scripts\python.exe -m streamlit run app.py --server.address=127.0.0.1 --server.port=8501
+```
+
+**Linux / macOS:**
 
 ```bash
-pip install -e ".[dashboard]"
-streamlit run app.py
+git clone https://github.com/BAITC-Hacks/hack-5f84cc63-vector.git
+cd hack-5f84cc63-vector
+python3 -m venv .venv
+./.venv/bin/python -m pip install -e ".[dashboard]"
+./.venv/bin/python -m streamlit run app.py --server.address=127.0.0.1 --server.port=8501
 ```
 
 Open **http://localhost:8501**. Demo mode needs no private workbooks or API keys.
 Russian is the default; **RU / EN** preserves scenarios, drafts and recorded review.
+
+**Stop:** press `Ctrl+C` in the application terminal. **Restart:** run only the last
+command for your OS from the project directory. No environment activation is required.
+The first dependency installation needs internet access.
+
+| Problem | Action |
+|---|---|
+| `python` / `python3` not found | Install Python 3.11+; on Windows add it to PATH and reopen the terminal. If `py` is available, create the environment with `py -3 -m venv .venv`. |
+| Linux `venv` is unavailable | Install the virtual-environment package for your Python version; on Ubuntu/Debian this is usually `sudo apt install python3-venv`. |
+| Port 8501 is busy | Without Docker, change `--server.port=8501` to `--server.port=8502` and open http://localhost:8502. For Docker, use the port mapping described above. |
+| Docker cannot connect to its daemon | Start Docker Desktop / Docker Engine, or use the instructions without Docker. |
 
 Local Docker is the primary handoff; no public deployment is performed.
 
