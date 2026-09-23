@@ -202,6 +202,7 @@ def workflow_case():
                 "rows": 2, "sha256": hashlib.sha256(raw).hexdigest()}}}
         (run_path / "replenishment_summary.json").write_text(json.dumps(summary), encoding="utf-8")
         app = AppTest.from_file(str(ROOT / "app.py"), default_timeout=30).run()
+        app.radio(key="language").set_value("en").run()
         check(not app.exception, "Dashboard did not render")
         widget(app.number_input, "Draft quantity").set_value(110)
         widget(app.button, "Add / update draft").click().run()
@@ -210,7 +211,7 @@ def workflow_case():
         widget(app.button, "Add / update draft").click().run()
         widget(app.selectbox, "Supplier").set_value("SystemElectric").run()
         widget(app.button, "Add / update draft").click().run()
-        app.radio[0].set_value("Draft review").run()
+        app.radio(key="workspace").set_value("Draft review").run()
         check(not app.get("download_button"), "Reviewed export exposed before review")
         check({h.value for h in app.subheader} == {"IEK", "SystemElectric"}, "Draft not grouped by supplier")
         widget(app.text_input, "Reviewer name").set_value("SYNTHETIC ACCEPTANCE TEST — not a human approval")
@@ -225,7 +226,7 @@ def workflow_case():
         check([r["order_quantity"] for r in exported] == ["110.0", "105.0"], "Manual quantity not preserved")
         check(all(r["explanation"] for r in exported), "Every order requires an explanation")
         check(audit["status"] == "reviewed_draft_not_sent", "Export status must remain a draft")
-        app.radio[0].set_value("Order planning").run()
+        app.radio(key="workspace").set_value("Order planning").run()
         widget(app.selectbox, "Supplier").set_value("IEK").run()
         widget(app.number_input, "Available stock (pieces)").set_value(55)
         widget(app.text_input, "Scenario reason").set_value("Synthetic stock revision")
@@ -233,7 +234,7 @@ def workflow_case():
         check(app.session_state.review is None and first["series_id"] not in app.session_state.cart,
               "Scenario edit must invalidate review and remove the stale line")
         check(len(app.session_state.cart) == 1, "Unrelated supplier draft line must remain")
-        app.radio[0].set_value("Draft review").run()
+        app.radio(key="workspace").set_value("Draft review").run()
         check(not app.get("download_button") and not app.exception, "Stale export still available")
     return {"evidence_type": "AppTest_with_synthetic_records", "suppliers": ["IEK", "SystemElectric"],
             "recommended_quantities": [105, 105], "reviewed_draft_quantities": [110, 105],

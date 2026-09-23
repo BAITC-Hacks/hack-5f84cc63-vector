@@ -148,16 +148,17 @@ class DashboardUITests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as root, patch.dict(os.environ, {"VECTOR_PROCESSED_ROOT": root}):
             write_run(root)
             app = AppTest.from_file(str(Path(__file__).parents[1] / "app.py"), default_timeout=20).run()
+            app.radio(key="language").set_value("en").run()
             self.assertFalse(app.exception)
             widget(app.button, "Add / update draft").click().run()
             self.assertEqual(len(app.session_state.cart), 1)
-            app.radio[0].set_value("Draft review").run()
+            app.radio(key="workspace").set_value("Draft review").run()
             self.assertFalse(app.get("download_button"))
             widget(app.text_input, "Reviewer name").set_value("Synthetic UI tester")
             app.checkbox[0].check()
             widget(app.button, "Mark draft reviewed").click().run()
             self.assertEqual(len(app.get("download_button")), 2)
-            app.radio[0].set_value("Order planning").run()
+            app.radio(key="workspace").set_value("Order planning").run()
             widget(app.number_input, "Available stock (pieces)").set_value(55)
             widget(app.text_input, "Scenario reason").set_value("Synthetic stock revision")
             widget(app.button, "Recalculate SKU").click().run()
@@ -168,7 +169,7 @@ class DashboardUITests(unittest.TestCase):
             widget(app.button, "Reset this SKU").click().run()
             self.assertFalse(app.session_state.overrides)
             self.assertFalse(app.exception)
-            app.radio[0].set_value("Data coverage").run()
+            app.radio(key="workspace").set_value("Data coverage").run()
             self.assertFalse(app.exception)
 
 

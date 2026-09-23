@@ -163,7 +163,13 @@ grouping is not implemented and would require both anonymized IDs and a logic ex
 Buttons navigate to matching SKU calculations, forecast inputs and draft review without
 changing scenario or cart state. A mismatched run disables real-example links.
 See [the four-minute walkthrough](../DEMO.md), now entirely inside the dashboard.
-86 tests pass; browser visual QA remains pending because no browser surface was available.
+`i18n.py` centralizes English message IDs and Russian translations. The default locale is
+Russian; the sidebar RU/EN radio stores a separate presentation preference. Page/filter
+values and business records retain their original identifiers; translated labels never
+enter calculations, review fingerprints or reviewed exports. Stable widget keys preserve
+scenario and review state when labels change. Source values and raw audit JSON are not translated.
+91 tests pass, including bilingual workflow/evidence coverage and byte-identical reviewed
+exports across a language switch. Browser visual QA remains pending.
 
 Next: visual rehearsal, partner input/export validation and order-quality evaluation.
 Do not treat observed sales as latent demand. Model selection has not beaten the baseline

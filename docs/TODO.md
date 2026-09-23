@@ -11,7 +11,7 @@
 - [x] Translate all eight project documents and the DATA.md generator to English.
 - [x] Record the English-language convention while preserving source labels and values.
 
-Current stage complete: Case validation evidence page and a dashboard-only jury walkthrough.
+Current stage complete: Russian-default UI with RU/EN switching across all four pages.
 
 - [ ] Resolve P0: SE master/semantics, current stock, lead times, source precedence.
 - [x] Create the source registry and IEK/SE adapters with validation.
@@ -61,6 +61,8 @@ Current stage complete: Case validation evidence page and a dashboard-only jury 
 - [x] Add seasonal comparison, daily stockout audit, one-off counterfactual, real candidate provenance and review checks to the dashboard.
 - [x] Validate report freshness/integrity and prevent old PASS fallback; link evidence to matching workflows without changing the draft.
 - [x] Pass 86 tests, including evidence controls, status labels, disabled mismatched-run links and draft-preserving navigation.
+- [x] Add central RU/EN translations, Russian default, localized forms/tables/charts, and stable internal page/filter values.
+- [x] Pass 91 tests; language switching preserves scenarios, drafts, review and reviewed CSV/JSON bytes.
 - [ ] Time the full dashboard-only rehearsal on the presentation laptop; functional AppTest is not visual QA.
 - [ ] Confirm whether the jury requires a hosted URL; local offline presentation is available, deployment is not implemented.
 - [ ] Add an LLM after the core calculation, if needed.

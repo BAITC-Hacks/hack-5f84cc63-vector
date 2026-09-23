@@ -14,18 +14,20 @@ From the project root, with dashboard dependencies installed:
 .venv/Scripts/python.exe -m streamlit run app.py
 ```
 
-Expected: **86 tests OK**; A/D PARTIAL, B/C/E PASS. Re-run acceptance after code changes:
+Expected: **91 tests OK**; A/D PARTIAL, B/C/E PASS. Re-run acceptance after code changes:
 the evidence page rejects stale reports. Internet and NVIDIA APIs are not needed after
-installation. Open http://127.0.0.1:8501 in a fresh session. Select **Scenario · 2026-10-01**
+installation. Open http://127.0.0.1:8501 in a fresh session. Select **Сценарий · 2026-10-01**
 with **992 / 941 / 1,724** ready / earlier supply / missing-input series. Identical replays
 are collapsed; the audited recommendation SHA begins `38128a4ca20b`.
 
+The interface defaults to Russian. Keep **RU** selected for this walkthrough; **EN** switches labels without changing calculations or drafts. Documentation remains English; the exact UI labels below are Russian.
+
 The entire pitch stays in the dashboard. Proof buttons select details below the cards;
-scroll to **Inspect the evidence** when opening a detailed proof.
+scroll to **Подробные доказательства** when opening a detailed proof.
 
 ## 0:00–0:55 — Five requirements, visible evidence
 
-Click **Case validation** in the sidebar. Scan the five cards:
+Click **Проверка кейса** in the sidebar. Scan the five cards:
 
 | Card | Say and point to |
 |---|---|
@@ -40,20 +42,20 @@ evidence are labeled separately, and missing evidence stays PARTIAL.”
 
 ## 0:55–1:40 — Explain and change a real-sales recommendation
 
-Click **Open IEK calculation** on card A. It selects **IEK / `010300002_`**.
-Scroll to **Order explanation**: **404 "шт"** = rounded **403.63** net need, from
+Click **Открыть расчёт IEK** on card A. It selects **IEK / `010300002_`**.
+Scroll to **Обоснование заказа**: **404 "шт"** = rounded **403.63** net need, from
 **431.48** forecast + **40.27** safety − **68.13** scenario stock − **0** incoming.
 The graph shows shortage on **October 13**, before the new order arrives **November 15**:
 an earlier receipt or transfer is needed, even after ordering.
 
-Open **What-if scenario**. Set stock **200**, keep lead **45**, review **30**, safety **7**,
+Open **Что если?**. Set stock **200**, keep lead **45**, review **30**, safety **7**,
 delay **0**, additional incoming **0**. Enter `Jury rehearsal: revised stock scenario` and
-click **Recalculate SKU**: **272**. Set additional incoming **100**, arrival **2026-10-02**,
+click **Пересчитать SKU**: **272**. Set additional incoming **100**, arrival **2026-10-02**,
 and recalculate: **172**. Session edits never overwrite the saved run or forecasts.
 
 ## 1:40–2:25 — Inspect the strongest evidence
 
-Return to **Case validation → One-off proof + real candidate**; scroll to the detail.
+Return to **Проверка кейса → Разовый заказ: тест и реальный кандидат**; scroll to the detail.
 The bars show **63 / 63 / 1,224**. Inflation is **0%**, below the preset **1%** bound
 for this fixture. This tests cleaning → forecast → order, not just an outlier flag.
 
@@ -63,28 +65,28 @@ Provenance: `se_transactions`, sheet "Лист_1", row **14950**, document **200
 in `Ежемесячные остатки SystemElectric 2024-2026.xlsx`. It is a candidate, not a verified
 customer anomaly; the document number is not a client ID.
 
-In **Proof detail**, select **C · Stockout**: July observed **20** → corrected **310**;
+In **Выбор доказательства**, select **C · Дефицит**: July observed **20** → corrected **310**;
 forecast **210 → 306.67**; order **67 → 104**. The daily audit shows 29 synthetic
 unavailable days and **290** estimated missing units.
 
-If asked about seasonality, choose **B · Seasonality**: combined **295 / 310 / 305**,
+If asked about seasonality, choose **B · Сезонность**: combined **295 / 310 / 305**,
 growth-only **285 / 290 / 295**, seasonality-only **110 / 120 / 110**.
 This generated example is not a real-data accuracy claim.
 
 ## 2:25–3:40 — Manager correction, supplier grouping, review and export
 
-Return to the cards and click **Open IEK calculation**. The session still recommends **172**.
-Under **Order explanation**, set **Draft quantity = 180**, reason
-`Jury rehearsal: manager adjustment`, then **Add / update draft**.
+Return to the cards and click **Открыть расчёт IEK**. The session still recommends **172**.
+Under **Обоснование заказа**, set **Количество в черновике = 180**, reason
+`Jury rehearsal: manager adjustment`, then **Добавить / обновить черновик**.
 The engine quantity remains 172; the manager quantity is separate.
 
-Set **Supplier = SystemElectric**, search **`010400432_`**, and press Enter. Expected **9 "шт"**.
-Click **Add / update draft** unchanged. Open **Draft review**: two supplier sections show
+Set **Поставщик = SystemElectric**, search **`010400432_`**, and press Enter. Expected **9 "шт"**.
+Click **Добавить / обновить черновик** unchanged. Open **Проверка черновика**: two supplier sections show
 **IEK 180 / SystemElectric 9** with explanations.
 
 Before review, reviewed-export buttons are absent. Enter **Demo reviewer**, acknowledge
-the exact quantities/assumptions, click **Mark draft reviewed**, then **Download reviewed CSV**
-and **Download full audit JSON**. This is local demo review, not a corporate purchase approval.
+the exact quantities/assumptions, click **Подтвердить проверку черновика**, then **Скачать проверенный CSV**
+and **Скачать полный аудит JSON**. This is local demo review, not a corporate purchase approval.
 
 ## 3:40–4:00 — Close with the boundary
 
@@ -93,7 +95,7 @@ retain explanations and source provenance, and keep the manager in control. Next
 validate current stock, supplier times, category rules, client identifiers and the 1C
 template with the partner.”
 
-Open **Data coverage** if challenged. Do not claim universal forecast superiority,
+Open **Качество данных** if challenged. Do not claim universal forecast superiority,
 verified anomaly labels, authenticated approval, production readiness or measured ROI.
 
 ## Readiness notes

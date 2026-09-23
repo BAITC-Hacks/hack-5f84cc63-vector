@@ -118,9 +118,10 @@ class EvidenceUITests(unittest.TestCase):
             report["real_examples"]["recommendation_sha256"] = hashlib.sha256((run / "recommendations.jsonl").read_bytes()).hexdigest()
             with patch("vector_pipeline.evidence_ui.load_acceptance", return_value=(report, Path("fixture/case_acceptance.json"), b"{}")):
                 app = AppTest.from_file(str(Path(__file__).parents[1] / "app.py"), default_timeout=30).run()
+                app.radio(key="language").set_value("en").run()
                 button(app, "Add / update draft").click().run()
                 before = deepcopy(app.session_state.cart)
-                app.radio[0].set_value("Case validation").run()
+                app.radio(key="workspace").set_value("Case validation").run()
                 html = "\n".join(x.value for x in app.markdown)
                 self.assertEqual(html.count(">PARTIAL</span>"), 2)
                 self.assertEqual(html.count(">PASS</span>"), 3)
@@ -131,13 +132,13 @@ class EvidenceUITests(unittest.TestCase):
                     self.assertEqual(app.session_state.evidence_detail, key)
                     self.assertFalse(app.exception)
                 button(app, "Open forecast inputs").click().run()
-                self.assertEqual(app.radio[0].value, "Order planning")
+                self.assertEqual(app.radio(key="workspace").value, "Order planning")
                 self.assertEqual(app.session_state.filter_query, "00123_")
                 self.assertEqual(app.get("tab_container")[0].proto.tab_container.default_tab_index, 2)
                 self.assertEqual(app.session_state.cart, before)
-                app.radio[0].set_value("Case validation").run()
+                app.radio(key="workspace").set_value("Case validation").run()
                 button(app, "Open draft review").click().run()
-                self.assertEqual(app.radio[0].value, "Draft review")
+                self.assertEqual(app.radio(key="workspace").value, "Draft review")
                 self.assertFalse(app.get("download_button"))
 
     def test_stale_report_hidden_and_other_run_links_disabled(self):
@@ -146,7 +147,8 @@ class EvidenceUITests(unittest.TestCase):
             write_run(tmp)
             with patch("vector_pipeline.evidence_ui.load_acceptance", side_effect=ValueError("Acceptance report is stale")):
                 app = AppTest.from_file(str(Path(__file__).parents[1] / "app.py"), default_timeout=30).run()
-                app.radio[0].set_value("Case validation").run()
+                app.radio(key="language").set_value("en").run()
+                app.radio(key="workspace").set_value("Case validation").run()
                 self.assertTrue(app.warning)
                 self.assertFalse(app.button)
             with patch("vector_pipeline.evidence_ui.load_acceptance", return_value=(ui_fixture(), Path("fixture/case_acceptance.json"), b"{}")):

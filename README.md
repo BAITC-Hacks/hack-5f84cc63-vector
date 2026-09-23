@@ -17,6 +17,14 @@ commands below if none exists. The dashboard discovers completed runs, verifies 
 recommendation hash/count, and defaults to the most recent distinct demonstration run.
 The sidebar also offers strict explicit-input runs. Changing runs resets session drafts.
 
+The interface defaults to **Russian**. Use **RU / EN** in the sidebar to switch languages.
+All four pages, forms, table headings, chart labels and evidence summaries are localized
+through `src/vector_pipeline/i18n.py`. Widget options keep stable internal IDs: switching
+language preserves the selected run, filters, applied scenarios, draft lines and recorded
+review. Reviewed CSV/JSON schemas, source names/SKU codes, audit keys and entered reasons
+remain unchanged. Documentation and code remain English; source/audit JSON is not translated.
+The workflow labels below use English; their Russian equivalents appear when RU is selected.
+
 1. **Order planning:** filter by supplier, warehouse, unit, action, or SKU/product;
    select a table row to see its calculation, inventory projection, assumptions and source evidence.
 2. **What-if scenario:** change available stock, lead/review times, safety days,
@@ -249,6 +257,7 @@ a failed latest run never falls back to an older PASS. Re-run acceptance after c
 Recorded examples remain separate from current session edits. Links to real SKU calculations
 are disabled when the selected calculation snapshot differs from the audited one.
 
-86 tests pass, including evidence integrity/staleness, status rendering, proof controls,
-workflow navigation and preservation of the existing draft. Browser visual QA, the exact
+91 tests pass, including evidence integrity/staleness, status rendering, proof controls,
+workflow navigation, translation coverage, placeholder parity and RU/EN switching with
+unchanged scenario/review/export state. Browser visual QA, the exact
 1C template, and operational data confirmation remain open. No new model or LLM was added.
