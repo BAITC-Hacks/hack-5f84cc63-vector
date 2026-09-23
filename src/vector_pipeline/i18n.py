@@ -1,6 +1,12 @@
 """English message IDs and Russian UI translations; source data stay unchanged."""
 
 _RUSSIAN = {
+    "To order": "К заказу",
+    "Covered by existing supply": "Покрыто запасом и поставками",
+    "Additional history needed": "Требуют дополнительной истории",
+    "Other inputs needed": "Требуют других данных",
+    "The order covers the expected need and supply timing, then rounds to the applicable purchasing quantity.": "Заказ покрывает ожидаемую потребность с учётом сроков поступления и округляется по применимым условиям закупки.",
+    "Where no eligible forecast exists, the sales history may be short, interrupted or unresolved. Vector does not fill these gaps with invented quantities. Missing stock and other operational inputs are counted separately.": "Если прогноз не сформирован, история продаж может быть короткой, прерывистой или неподтверждённой. Vector не подставляет вымышленные значения. Отсутствующие остатки и другие операционные данные учтены отдельно.",
     "Public demo": "Публичное демо",
     "Review workspace · No supplier connection": "Проверка заказов · Без связи с поставщиками",
     "PUBLIC DEMO · All products, sales, stock and receipts are synthetic. No partner business records are included.": "ПУБЛИЧНОЕ ДЕМО · Все товары, продажи, остатки и поступления синтетические. Деловые данные партнёра не включены.",

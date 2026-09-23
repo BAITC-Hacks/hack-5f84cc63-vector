@@ -183,7 +183,7 @@ the shipped real-data demonstration supplies labeled scenario assumptions where 
 Check shortages before arrivals, not only the final inventory balance.
 Do not conflate minimum quantity and order multiple. Any future LLM must explain computed numbers.
 
-## Public deployment
+## Local Docker handoff and synthetic demo
 
 `select_processed()` prefers completed private runs and falls back to the committed
 `demo/` tree. `VECTOR_PROCESSED_ROOT=demo` previews that mode explicitly. Forty generated
@@ -195,7 +195,52 @@ labeled and contains no copied partner observations. Nothing trains at app start
 small synthetic acceptance scenarios. The public report records normalized source hashes
 and exact artifact hashes; `.gitattributes` fixes demo artifacts to LF across platforms.
 Private acceptance checks remain unchanged and still require private source artifacts.
-The cloud entrypoint is `app.py`; `requirements.txt` installs `.[dashboard]`. There is
-no committed loopback binding. Public-host deployment and visual browser QA are pending.
+The entrypoint is `app.py`; `requirements.txt` installs `.[dashboard]`.
+Public deployment is deferred at the user's request. Docker is the primary admin/jury
+handoff: `python:3.11-slim`, explicit COPY paths, non-root runtime, Streamlit health check,
+and `0.0.0.0:8501` inside the container. README publishes the port on host loopback only.
+`.dockerignore` excludes partner Excel, private `data/`, Git, environments, secrets and
+generated caches. Private data may be mounted read-only at runtime, never baked into the
+image. No database, Compose, external API or image-registry publication is needed.
+Docker build/run remain unverified because the local Docker Engine was unavailable;
+the synthetic workspace already passes the clean-copy AppTest. Browser visual QA remains pending.
 For this packaging/UI change, only the synthetic bundle build and focused clean-checkout
 smoke check were run; the full unit suite was not rerun.
+
+## Private pipeline commands
+
+Technical run instructions moved from README; these are unnecessary for the bundled demo.
+Run from the repository root with dependencies installed. Raw Excel remains private in
+`data/IEK/` and `data/system_electric/`. Replace angle-bracket placeholders with the actual
+run directories printed by each command.
+
+```bash
+python scripts/eda.py
+python -m vector_pipeline.cli
+python scripts/verify_ingestion.py data/processed/canonical/<canonical-run>
+python -m vector_pipeline.demand_cli data/processed/canonical/<canonical-run>
+python scripts/verify_demand.py data/processed/canonical/<canonical-run> data/processed/demand/<demand-run>
+python -m vector_pipeline.forecast_cli data/processed/demand/<demand-run>
+python scripts/verify_forecast.py data/processed/forecast/<forecast-run>
+python -m vector_pipeline.replenishment_cli data/processed/forecast/<forecast-run> data/processed/canonical/<canonical-run> --demo
+```
+
+The final command explicitly enables scenario operational inputs; it does not confirm a
+business order. For real operational inputs, use `--inputs path.json` instead; for stockout
+intervals, see [REPLENISHMENT_POLICY.md](REPLENISHMENT_POLICY.md). EDA overwrites its default
+report, while downstream stages create new run directories. Source workbooks are read-only.
+The registry in `config/sources.json` checks filenames, hashes and structure; interpretation
+overrides in `config/ingestion.json` require explicit status, evidence or an assumption ID
+and reason. Monthly sources remain reconciliation-only until their use is validated.
+
+For a public-mode preview on a laptop, set `VECTOR_PROCESSED_ROOT=demo`; remove the override
+to resume automatic private-data discovery. Refresh synthetic evidence with
+`python scripts/build_demo.py`; refresh private evidence with `python scripts/accept_case.py`.
+For deployment changes, use the focused check
+`python -m unittest discover -s tests -p test_public_demo.py -q` rather than rerunning the
+full suite after every documentation or presentation edit.
+
+Main planning KPIs show positive orders, early-supply alerts, covered series and draft lines.
+Data coverage separately counts missing forecasts and other missing inputs, so a missing
+stock value is not mislabeled as a history problem. Model names and raw forecast details
+remain under Technical audit. Core calculations are unchanged by this presentation pass.

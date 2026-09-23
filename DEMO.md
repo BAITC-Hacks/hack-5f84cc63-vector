@@ -1,6 +1,16 @@
 # Vector: four-minute jury walkthrough
 
-## Public hosted demo: no private data required
+## Local synthetic demo: no private data required
+
+The current handoff is local Docker, not public hosting. From the repository root:
+
+```bash
+docker build -t vector .
+docker run --rm --name vector-demo -p 127.0.0.1:8501:8501 vector
+```
+
+Open http://localhost:8501. Docker build/run still need an available engine for verification;
+the no-private-data application workflow has passed AppTest. See README for Python fallback.
 
 Public mode displays **ПУБЛИЧНОЕ ДЕМО** and 40 generated SKU series. All examples are
 synthetic, including the candidate in case D. Never present these as partner observations.
@@ -35,7 +45,8 @@ From the project root, with dashboard dependencies installed:
 Expected: A/D PARTIAL, B/C/E PASS. Re-run `scripts/accept_case.py` only when its saved evidence is stale after code changes:
 the evidence page rejects stale reports. Internet and NVIDIA APIs are not needed after
 installation. Open http://127.0.0.1:8501 in a fresh session. Select **Сценарий · 2026-10-01**
-with **992 / 941 / 1,724** ready / earlier supply / missing-input series. Identical replays
+with **976 / 941 / 16 / 0** to-order / earlier supply / covered / draft series. Data coverage
+retains the **1,724** series requiring additional history. Identical replays
 are collapsed; the audited recommendation SHA begins `38128a4ca20b`.
 
 The interface defaults to Russian. Keep **RU** selected for this walkthrough; **EN** switches labels without changing calculations or drafts. Documentation remains English; the exact UI labels below are Russian.
@@ -124,7 +135,7 @@ verified anomaly labels, authenticated approval, production readiness or measure
 - Evidence is a frozen acceptance snapshot; session edits do not rewrite it. Real-example
   links are disabled for a different selected run. Return to the audited October scenario
   if needed; changing runs clears session drafts.
-- Confirm whether the jury requires deployment. Local presentation is available; exact
-  1C import compatibility and a hosted deployment are not implemented.
+- Use local Docker or the Python fallback; public deployment is deferred. Verify the
+  container on the admin machine. Exact 1C import compatibility remains unconfirmed.
 - After the timed pitch, optionally edit IEK's scenario again: its stale draft line is
   removed, SE's line remains, and review/export eligibility is revoked.

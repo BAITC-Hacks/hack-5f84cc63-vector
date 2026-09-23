@@ -163,7 +163,7 @@ def show_details(row):
     st.divider()
     st.subheader(t('{v0} · {v1}', v0=row['sku_id'], v1=row['supplier_id']))
     st.write(info.get("name") or t("Product name unresolved in the source data"))
-    st.caption(t('{v0} · {v1} · Model: {v2}', v0=row['warehouse_id'], v1=row['stock_uom'], v2=t(row.get('forecast_model') or 'unavailable')))
+    st.caption(f"{row['warehouse_id']} · {row['stock_uom']}")
     tabs = st.tabs([t(label) for label in ["Order explanation", "What-if scenario", "Source evidence"]],
                    default=t(st.session_state.pop("detail_default", "Order explanation")))
     with tabs[0]:
@@ -182,7 +182,7 @@ def show_details(row):
                     "Timing requirement": calc["timing_requirement"], "Rounding added": calc["rounding_increment"]}
                 st.dataframe(localize_frame(pd.DataFrame({"Component": list(components), "Quantity": [fmt(v) for v in components.values()]}), language),
                     hide_index=True, width="stretch")
-                st.caption(t('Order = round(max(0, net requirement, timing requirement)), subject to applied minimum and multiple.'))
+                st.caption(t('The order covers the expected need and supply timing, then rounds to the applicable purchasing quantity.'))
                 unresolved = sum(not c.get("applied", False) for c in row["constraint_audit"])
                 if unresolved:
                     st.caption(t('{v0} supplier constraint(s) unresolved / not applied. Stock-unit rounding does not establish supplier MOQ.', v0=unresolved))
@@ -254,7 +254,6 @@ def show_details(row):
         if forecasts:
             st.markdown(t("**Monthly forecast used by the engine**"))
             st.dataframe(localize_frame(pd.DataFrame([{"Month": f["target_month"], "Forecast": f["forecast_qty"],
-                "Mean baseline": f.get("baseline_forecast_qty"), "Model": f["model"],
                 "As of": f["as_of_date"]} for f in forecasts]), language), hide_index=True, width="stretch")
         st.caption(t('Seasonality and growth are included in the model where supported; they are not added a second time. Category and customer IDs are unavailable in the supplied data.'))
         st.write(t('Forecast source: synthetic sales' if public_demo else 'Forecast source: real regular observed sales'))
@@ -264,6 +263,7 @@ def show_details(row):
         st.write(t('Supplier constraints are applied only when explicitly resolved. Real stockout intervals are unavailable.'))
         with st.expander(t('Technical audit')):
             st.caption(t("Audit keys, source values and CSV/JSON exports retain their original language and schema."))
+            st.json({"forecast_model": row.get("forecast_model"), "forecasts": row.get("forecast_values_used", [])})
             st.json(row["inputs"])
             st.write(t('Assumption IDs'), row["assumption_ids"])
             st.json({"incoming": row["incoming_audit"], "constraints": row["constraint_audit"]})
@@ -272,9 +272,9 @@ def show_details(row):
 
 if page == "Order planning":
     a, b, c, d = st.columns(4)
-    a.metric(t('Ready for review'), f"{sum(r['recommended_quantity'] is not None for r in rows):,}")
+    a.metric(t('To order'), f"{sum((r['recommended_quantity'] or 0) > 0 for r in rows):,}")
     b.metric(t('Early shortage (scenario)' if scenario_count else 'Earlier supply needed'), f"{sum(r['urgency'] == 'expedite_or_transfer' for r in rows):,}")
-    c.metric(t('Missing inputs'), f"{sum(r['recommendation_status'] == 'unavailable' for r in rows):,}")
+    c.metric(t('Covered by existing supply'), f"{sum(r['recommended_quantity'] == 0 for r in rows):,}")
     d.metric(t('Draft lines'), len(st.session_state.cart))
     st.caption(t('Counts cover the entire selected run, including session edits. Each series is a supplier / SKU / warehouse / unit combination.'))
     st.subheader(t('Recommendations'))
@@ -346,10 +346,14 @@ elif page == "Draft review":
 
 else:
     st.subheader(t('What this run can support'))
-    a, b, c = st.columns(3)
+    a, b, c, d = st.columns(4)
+    needs_history = sum('forecast_unavailable' in r['unavailable_reasons'] for r in rows)
+    needs_inputs = sum(r['recommended_quantity'] is None and 'forecast_unavailable' not in r['unavailable_reasons'] for r in rows)
     a.metric(t('Series in run'), f"{len(rows):,}")
     b.metric(t('Scenario quantities'), f"{scenario_count:,}")
-    c.metric(t('Unavailable quantities'), f"{sum(r['recommended_quantity'] is None for r in rows):,}")
+    c.metric(t('Additional history needed'), f"{needs_history:,}")
+    d.metric(t('Other inputs needed'), f"{needs_inputs:,}")
+    st.caption(t('Where no eligible forecast exists, the sales history may be short, interrupted or unresolved. Vector does not fill these gaps with invented quantities. Missing stock and other operational inputs are counted separately.'))
     st.dataframe(localize_frame(pd.DataFrame([{"Supplier": supplier_id,
         "Total series": sum(r["supplier_id"] == supplier_id for r in rows),
         "Available recommendations": sum(r["supplier_id"] == supplier_id and r["recommended_quantity"] is not None for r in rows)}

@@ -703,7 +703,7 @@
   "registered_workbooks_verified": 0,
   "scope": "public_synthetic",
   "source_text_sha256": {
-    "app.py": "8d13d134b52b62d0f449fca32c93515e777bdb4c36e904e25d6987286e5b61f0",
+    "app.py": "876a193072254a76c178e8f0e1de88ea5906d53abbbc256181f4b7876613094c",
     "config/demand.json": "dff30633e0d0ff4dc3dca8a99a02922329dfe868c32bc0a77420c5c6a0e6cd8b",
     "config/forecast.json": "edd3a6b1ce8d91f619030bcd00aaf319fa25f49965782e0fb388b5e8596c9f34",
     "config/replenishment.json": "31d5e33ab7553d6c4d33196f3cdfc0b2b7f38f8f437f8be2258dc1febf2ef42c",
@@ -721,7 +721,7 @@
     "src/vector_pipeline/evidence_ui.py": "75f759c25d4028637ef14b4efcf52dd6e36973f0dd462a34d66aede63c5604d1",
     "src/vector_pipeline/forecast.py": "599592f7bc2738b76ea44293027acd1365fd4e672b9e3559d185b6e40049d985",
     "src/vector_pipeline/forecast_cli.py": "80c23ec2325a420d98b94cabe7ac5060644d0bf3e7d40b9bada1bcb0d1937a7e",
-    "src/vector_pipeline/i18n.py": "659b9b9de30355ca56d1b487cc8743a7c3b8502b2ee1383ba91046e930aff316",
+    "src/vector_pipeline/i18n.py": "a6d7997bbb59ed54c5a333dffdc0a84bb9155346c69a61d9a6dd85025e92d99c",
     "src/vector_pipeline/parsing.py": "183e99a03c1904c0ebd9f5ee6a719749c1b9b02dbe8fa2502c4a331372325827",
     "src/vector_pipeline/pipeline.py": "332de40e5ff165345c4cd9fa0cd9e787ee51eedb5cb517dbe9b605420c4d6cd0",
     "src/vector_pipeline/reconciliation.py": "0836a74166f1c7c695d142d193ac85c4661db3900275bd27a21a723add8c98f3",

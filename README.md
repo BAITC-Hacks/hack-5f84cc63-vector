@@ -2,13 +2,51 @@
 
 # Vector — AI Procurement Copilot
 
-**[English version ↓](#english)** · [Запуск](#quickstart-ru) · [Демо за 4 минуты](DEMO.md) · [Методология](#methods-ru)
+**[English version ↓](#english)** · [Запуск в Docker](#docker-ru) · [Демо за 4 минуты](DEMO.md) · [Методология](#methods-ru)
 
 **Из выгрузок продаж, остатков и поставок — в понятный черновик заказа поставщику.**
 
 Vector помогает закупщику ответить на три вопроса: **что заказать, сколько и почему**.
 Вместо ручного объединения Excel — рекомендации по каждому товару, объяснение расчёта
 и проверка менеджером перед экспортом. MVP для **HackAlem AI · Электрокомплект**.
+
+<a id="docker-ru"></a>
+
+## Быстрый запуск для жюри и администраторов — Docker
+
+Нужны Git и запущенный Docker Desktop в режиме **Linux containers** (Windows/macOS)
+или Docker Engine (Linux). Команды одинаковы для PowerShell, bash и терминала macOS:
+
+```bash
+git clone https://github.com/BAITC-Hacks/hack-5f84cc63-vector.git
+cd hack-5f84cc63-vector
+docker build -t vector .
+docker run --rm --name vector-demo -p 127.0.0.1:8501:8501 vector
+```
+
+Откройте **http://localhost:8501**. Контейнер запускает весь интерфейс на **40 синтетических
+SKU**; Python, Excel и API-ключи на компьютере не нужны. Для первого build нужен интернет,
+после сборки приложение работает без внешних API. Если репозиторий закрытый, нужен доступ к нему.
+
+Для остановки в другом терминале:
+
+```bash
+docker stop vector-demo
+```
+
+Если порт 8501 занят, замените публикацию порта на `-p 127.0.0.1:8502:8501` и откройте
+http://localhost:8502. Внутри контейнера Streamlit слушает `0.0.0.0:8501`, а приведённая
+команда открывает порт только на вашем компьютере.
+
+**Реальные Excel и `data/processed/` не нужны для демо и не входят в образ.**
+Они исключены через `.dockerignore`, а Dockerfile копирует только перечисленные файлы.
+Не добавляйте `data/` в GitHub: при необходимости передайте приватные материалы
+администраторам отдельно по согласованному с организаторами каналу.
+
+Проверка интерфейса на чистой копии без `data/` пройдена. **Сборка и запуск Docker
+пока не проверены:** на машине разработки недоступен Docker Engine. Конфигурация
+использует стандартный Linux-образ `python:3.11-slim` и не зависит от Docker Desktop
+конкретного разработчика. Администратору нужно выполнить приведённые build/run команды.
 
 ## Что умеет Vector
 
@@ -57,7 +95,7 @@ flowchart LR
 
 <a id="quickstart-ru"></a>
 
-## Запуск
+## Запуск без Docker
 
 Из корня репозитория, в Python 3.11+ (проверено на 3.14):
 
@@ -70,10 +108,24 @@ streamlit run app.py
 Интерфейс по умолчанию русский; переключатель **RU / EN** находится слева.
 Смена языка сохраняет сценарий, черновик и отметку о проверке.
 
-Для Streamlit Community Cloud: репозиторий и ветка → основной файл **`app.py`** → Python **3.14**.
-Зависимости устанавливаются через `requirements.txt`; демоданные уже в репозитории.
-Первый публичный запуск и проверка полученного URL ещё предстоят.
-[Инструкция Streamlit](https://docs.streamlit.io/deploy/streamlit-community-cloud/deploy-your-app/deploy).
+Основной способ передачи MVP — локальный Docker. Публичный деплой не выполняется.
+
+<details>
+<summary>Администратору: подключить существующие приватные данные локально</summary>
+
+Если в локальной папке `data/` уже есть готовые расчёты `processed/`, её можно подключить
+только для чтения. Команду запускайте из корня проекта:
+
+```bash
+docker run --rm --name vector-private -p 127.0.0.1:8501:8501 --mount "type=bind,source=${PWD}/data,target=/app/data,readonly" vector
+```
+
+Данные подключаются при запуске и не встраиваются в образ. Одних Excel недостаточно:
+сначала нужен [pipeline](docs/ARCHITECTURE.md#private-pipeline-commands). Полная проверка
+частных доказательств требует совпадения исходных файлов, кода и сохранённого отчёта;
+без них рекомендации доступны, но экран доказательств может сообщить об устаревшем отчёте.
+
+</details>
 
 <a id="methods-ru"></a>
 
@@ -139,6 +191,34 @@ Vector helps purchasing managers decide **what to order, how much and why**.
 It replaces manual spreadsheet consolidation with per-item recommendations, transparent
 calculations and manager review before export. Built for **HackAlem AI · Electrokomplekt**.
 
+### Quick start for jury and administrators — Docker
+
+Install Git and start Docker Desktop in **Linux containers** mode (Windows/macOS), or
+Docker Engine (Linux). Run in PowerShell, bash or the macOS terminal:
+
+```bash
+git clone https://github.com/BAITC-Hacks/hack-5f84cc63-vector.git
+cd hack-5f84cc63-vector
+docker build -t vector .
+docker run --rm --name vector-demo -p 127.0.0.1:8501:8501 vector
+```
+
+Open **http://localhost:8501**. The full interface starts with **40 synthetic SKU series**.
+No host Python, private workbooks or API keys are needed. The first build downloads
+dependencies; the built app uses no external APIs. Private repository access may be required.
+Stop it from another terminal with `docker stop vector-demo`.
+
+If port 8501 is busy, use `-p 127.0.0.1:8502:8501` and open http://localhost:8502.
+Streamlit listens on `0.0.0.0:8501` inside the container; the example publishes it only
+on the local computer. **Partner Excel and `data/processed/` never enter the image:**
+`.dockerignore` excludes them and Dockerfile copies only explicitly listed files.
+Keep private data out of GitHub; share it separately through an organizer-approved channel if needed.
+
+The interface passes a clean-copy check without `data/`. **Docker build/run are not yet
+verified:** the development machine's Docker Engine was unavailable. The Dockerfile
+uses the standard Linux `python:3.11-slim` image without developer-specific settings;
+the administrator should run the build/run commands above.
+
 ### What Vector does
 
 - Flags candidate one-off bulk sales and excludes them from regular calculations while retaining the original records.
@@ -190,10 +270,23 @@ streamlit run app.py
 Open **http://localhost:8501**. Demo mode needs no private workbooks or API keys.
 Russian is the default; **RU / EN** preserves scenarios, drafts and recorded review.
 
-For Streamlit Community Cloud: repository/branch → entrypoint **`app.py`** → Python **3.14**.
-`requirements.txt` installs the dependencies; demo artifacts are already bundled.
-The first hosted launch and public-URL check remain pending.
-[Official deployment guide](https://docs.streamlit.io/deploy/streamlit-community-cloud/deploy-your-app/deploy).
+Local Docker is the primary handoff; no public deployment is performed.
+
+<details>
+<summary>Administrator: mount existing private data locally</summary>
+
+If `data/` already contains prepared `processed/` runs, launch from the repository root:
+
+```bash
+docker run --rm --name vector-private -p 127.0.0.1:8501:8501 --mount "type=bind,source=${PWD}/data,target=/app/data,readonly" vector
+```
+
+This read-only runtime mount does not embed data in the image. Raw Excel alone is
+insufficient: first run the [pipeline](docs/ARCHITECTURE.md#private-pipeline-commands).
+Private acceptance evidence also requires matching source files, code and saved reports;
+otherwise recommendations can load while the evidence page reports a stale snapshot.
+
+</details>
 
 ### How quantities are calculated
 

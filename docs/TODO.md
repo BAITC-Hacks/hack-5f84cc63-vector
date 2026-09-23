@@ -67,7 +67,11 @@ Current stage complete: Russian-default UI with RU/EN switching across all four 
 - [x] Package a public synthetic demo (40 SKU series), automatically used when private runs are absent.
 - [x] Make configuration cloud-ready, declare dashboard installation, and verify a checkout without private data using one focused smoke check.
 - [x] Shorten chart legends, clarify scenario shortage counts and collapse raw technical audit fields.
-- [ ] Push the prepared files manually and deploy `app.py` to Streamlit Community Cloud; verify the public URL and Linux dependency install.
+- [x] Rewrite README for a jury audience: Russian first, English anchor below, quick demo, methodology and honest case status.
+- [x] Focus planning KPIs on orders; move missing forecast counts to Data coverage and model details to Technical audit.
+- [x] Prepare local Docker handoff on Python 3.11, explicit public-file copies, private-data exclusions and bilingual copy/paste startup commands.
+- [ ] Verify Docker build/run on an available Linux Docker Engine; the development engine was unavailable. Public deployment is deferred by user request.
+- [ ] User commits/pushes the prepared files and rehearses the jury demo; partner Excel stays outside Git and the image.
 - [ ] Add an LLM after the core calculation, if needed.
 - [ ] Confirm the provider, eligible endpoints, expiry and terms of the user-reported $50 NVIDIA API credits.
       Potential use: an explanation/query copilot over computed results; no API calls or spending authorized by this note.
