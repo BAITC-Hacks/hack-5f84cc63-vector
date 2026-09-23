@@ -2,7 +2,53 @@
 
 HackAlem AI / Electrokomplekt. EDA, ingestion, cleaning, forecasting, and replenishment v1 are implemented.
 Explicit-interval stockout correction is implemented; real intervals and current operational stock remain unavailable.
-The interface is not implemented yet.
+The local Streamlit workspace supports recommendation review, per-SKU scenarios,
+supplier-grouped drafts, and reviewed CSV/JSON exports.
+
+## Open the dashboard
+
+```powershell
+.venv/Scripts/python.exe -m pip install -e ".[dashboard]"
+.venv/Scripts/python.exe -m streamlit run app.py
+```
+
+Open http://127.0.0.1:8501. A completed replenishment run is required; use the pipeline
+commands below if none exists. The dashboard discovers completed runs, verifies the
+recommendation hash/count, and defaults to the most recent distinct demonstration run.
+The sidebar also offers strict explicit-input runs. Changing runs resets session drafts.
+
+1. **Order planning:** filter by supplier, warehouse, unit, action, or SKU/product;
+   select a table row to see its calculation, inventory projection, assumptions and source evidence.
+2. **What-if scenario:** change available stock, lead/review times, safety days,
+   future receipt delays or an additional dated receipt. Supply a reason and recalculate.
+   Edits affect one SKU in the current session. The engine and frozen forecasts are unchanged.
+3. Add selected recommendations to the draft. Manual quantities require a reason
+   and must satisfy the applied minimum and rounding step. Remove a line to skip it.
+4. **Draft review:** inspect supplier groups, enter a reviewer name, acknowledge the
+   exact quantities and assumptions, then download CSV and the complete audit JSON.
+   Editing a draft invalidates review; editing a scenario removes that SKU's stale draft line.
+5. **Data coverage:** inspect unavailable quantities, missing inputs and measured limitations.
+6. **Case validation:** scan five requirement cards with source/evidence labels, before/after
+   quantities and honest PASS/PARTIAL statuses. Open the saved proofs, the matching SKU's
+   calculation/forecast inputs, or draft review. No acceptance test runs during page rendering.
+
+The default workspace is explicitly a **scenario**, not confirmed company purchasing needs.
+The inventory chart shows the engine's recommendation, not a manually overridden draft quantity.
+No quantity totals combine different units, and no currency savings are invented.
+Product names are loaded only from the matching, verified canonical run; conflicts remain unresolved.
+
+CSV is UTF-8 with BOM and formula-sensitive strings are escaped. JSON preserves exact
+SKU identifiers, input evidence and calculation details. CSV compatibility with the
+company's specific 1C template remains **unvalidated**; automatic Excel type inference
+can alter numeric-looking identifiers, so import SKU columns as text or use JSON.
+Review is a local acknowledgement, not authenticated corporate approval. Nothing is
+sent to suppliers. Drafts/edits remain in browser-session memory until downloaded;
+reloads, disconnection or run changes can discard them. The server binds to localhost
+and Streamlit usage telemetry is disabled.
+
+Install the dashboard extra before running the full test suite. UI tests use synthetic
+fixtures and Streamlit AppTest; they do not approve real business orders. Set
+`VECTOR_PROCESSED_ROOT` to use an alternate local processed-data directory.
 
 ## Run (PowerShell, Python 3.11+)
 
@@ -25,7 +71,7 @@ Rerunning EDA overwrites these generated reports. Alternative output paths:
 .venv/Scripts/python.exe -X utf8 scripts/eda.py --output data/processed/eda_check.json --markdown data/processed/eda_check.md
 ```
 
-data/ and .venv/ are excluded from Git. The report is reproducible locally.
+data/processed/ and .venv/ are excluded from Git. The report is reproducible locally.
 Do not add source sales data to a public repository.
 
 ## EDA methodology
@@ -41,7 +87,7 @@ MOQ coverage distinguishes absent codes, invalid values, and positive values.
 Monthly quantities are compared with transactions only on observed numeric pairs.
 Column-level 3×IQR diagnostics mix SKUs and units: they are not a production algorithm
 for excluding one-off orders. Document-level screening is implemented separately below;
-order methodology remains to be implemented.
+order methodology is documented in [Replenishment policy](docs/REPLENISHMENT_POLICY.md).
 
 ## Findings
 
@@ -167,5 +213,42 @@ lost sales from earlier history, and refits the frozen forecast model. Real inte
 absent; synthetic tests demonstrate the correction. Forecast v1 was not tuned in this stage.
 See [Replenishment policy, inputs and verified results](docs/REPLENISHMENT_POLICY.md).
 
-Next stage: a dashboard for reviewing recommendations and assumptions, editing scenarios,
-and exporting manager-approved drafts. No automatic supplier sending or LLM calculation.
+The dashboard uses these outputs directly; see the launch and review workflow above.
+Next: rehearse the complete case demo, validate the partner's operational inputs and
+1C import template, and measure order quality under an explicit historical evaluation protocol.
+No automatic supplier sending or LLM calculation is implemented.
+
+## Case acceptance and jury walkthrough
+
+```powershell
+.venv/Scripts/python.exe -X utf8 scripts/accept_case.py
+```
+
+This runs the existing cleaning, forecast, stockout, order and dashboard code on explicit
+synthetic scenarios, verifies real demo examples, and checks all 12 registered workbook
+hashes and unchanged core/config/source files. The command prints a compact result and
+writes `data/processed/acceptance/<report-hash>/case_acceptance.json`. Identical reruns
+produce the same report. Use `--replenishment` and `--demand` to select the audited runs;
+the default run IDs are documented in the policy files. Failure of an executable check
+returns a nonzero exit code. PARTIAL means a known requirement/evidence gap, not a failed test.
+
+| Must-have | Result | Evidence boundary |
+|---|---|---|
+| Base replenishment | PARTIAL | Numeric inputs affect orders correctly; category data and validated external coefficient applicability are missing. |
+| Seasonality and growth | PASS | Joint mechanism verified on 36 synthetic months; no new real-data superiority claim. |
+| Stockout compensation | PASS | Synthetic intervals increase the order from 67 to 104; real intervals remain absent. |
+| One-off exclusion | PARTIAL | A 9,000-unit injection leaves the regular order at 63 instead of 1,224 unscreened; client-level detection cannot be established without customer IDs. |
+| Explained supplier-grouped reviewed orders | PASS | Two-supplier AppTest verifies manual adjustment, review, CSV/JSON and invalidation; local review only. |
+
+[DEMO.md](DEMO.md) gives a 3–5 minute script with exact clicks and expected values.
+The demonstration now stays inside the dashboard: **Case validation** reads the latest
+acceptance report and provides seasonal, stockout, anomaly and review evidence below its
+five summary cards. It verifies the report content hash, current code/config/source hashes,
+and referenced data artifacts. Missing, stale or corrupt reports show a regeneration command;
+a failed latest run never falls back to an older PASS. Re-run acceptance after code changes.
+Recorded examples remain separate from current session edits. Links to real SKU calculations
+are disabled when the selected calculation snapshot differs from the audited one.
+
+86 tests pass, including evidence integrity/staleness, status rendering, proof controls,
+workflow navigation and preservation of the existing draft. Browser visual QA, the exact
+1C template, and operational data confirmation remain open. No new model or LLM was added.

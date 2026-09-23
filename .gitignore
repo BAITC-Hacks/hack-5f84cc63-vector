@@ -1,4 +1,4 @@
-data/processed/
+data/
 # Secrets
 .env
 *.env
